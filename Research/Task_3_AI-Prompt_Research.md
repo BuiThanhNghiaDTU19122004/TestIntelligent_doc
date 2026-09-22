@@ -90,7 +90,7 @@ flowchart TD
   subgraph S07_Orchestration ["2. Server-Controlled Gateway & Execution"]
     TC --> S07["S07 Orchestration Engine"]
     S07 -->|Validate Intent & Allowlist| GTW["AgentCore Gateway & Worker"]
-    GTW -->|Inject Secrets & Resolve Binding| EXEC["Domain Deterministic Tools\n(Hurl, Testcontainers, Playwright, k6, Semgrep)"]
+    GTW -->|Inject Secrets & Resolve Binding| EXEC["Domain Deterministic Tools\n(Playwright API, Aurora Clone, Playwright UI, k6, Semgrep/Inspector)"]
   end
 
   subgraph S08_S09 ["3. Evidence & Deterministic Gate"]
@@ -111,7 +111,7 @@ flowchart TD
   "candidate_id": "TC-CAND-API-20260922-001",
   "truth_class": "CANDIDATE",
   "domain": "API",
-  "test_type": "CONTRACT_AND_FUNCTIONAL",
+  "test_type": "SCHEMA_AND_FUNCTIONAL",
   "target_operation_ref": "OP_ORDER_CREATE",
   "http_method": "POST",
   "request_specification": {
@@ -173,7 +173,7 @@ flowchart TD
 - **Prompt bổ sung cho S05 (Test Planning)**:
   > "Khi phân tích artifact API (OpenAPI 3.x, Swagger, Interface Contract):
   > 1. Đối chiếu diff giữa base version và head version để xác định tập endpoints bị ảnh hưởng trực tiếp (direct impact) và các luồng phụ thuộc (indirect consumer endpoints).
-  > 2. Phân loại kế hoạch kiểm thử theo 4 tầng bắt buộc: (a) Schema/Contract Validation (field mới, kiểu dữ liệu, required flags); (b) Happy Path Functional Flow; (c) Boundary & Negative Input (payload rỗng, giá trị biên âm, ký tự đặc biệt, kiểu dữ liệu sai); (d) Idempotency Check.
+  > 2. Phân loại kế hoạch kiểm thử theo 4 tầng bắt buộc: (a) Schema Validation (field mới, kiểu dữ liệu, required flags); (b) Happy Path Functional Flow; (c) Boundary & Negative Input (payload rỗng, giá trị biên âm, ký tự đặc biệt, kiểu dữ liệu sai); (d) Idempotency Check. (Lưu ý: Fuzzing diện rộng được ủy thác cho Schemathesis - Task 1; S05/S06 tập trung sâu vào kịch bản flow nghiệp vụ cho Playwright API runner).
   > 3. Lập danh sách `approved_test_ids` từ catalog có sẵn và chỉ định chính xác các khoảng trống (`coverage_gaps`) cần S06 sinh candidate."
 - **Prompt bổ sung cho S06 (Candidate Generation)**:
   > "Khi sinh TestCandidate cho khoảng trống API:
@@ -467,7 +467,7 @@ Kiểm thử giao diện người dùng đòi hỏi các bước tương tác tr
 - **Prompt bổ sung cho S05 (Test Planning)**:
   > "Khi phân tích artifact UI (Frontend code diff, React/Vue components, Figma design tokens, Route definitions):
   > 1. Xác định các màn hình và tương tác bị tác động (Button mới, Modal thay đổi form fields, Validation error states, Chuyển hướng route).
-  > 2. Lập kế hoạch kiểm thử đa tầng: (a) Happy Path Journey; (b) Form Validation & Error States; (c) Khả năng tiếp cận Accessibility (WCAG 2.1 AA via Axe); (d) Visual Layout Conformance.
+  > 2. Lập kế hoạch kiểm thử đa tầng: (a) Happy Path Journey; (b) Form Validation & Error States; (c) Khả năng tiếp cận Accessibility (WCAG 2.1 AA via Axe); (d) Console Errors & DOM State Sanity (đã cắt giảm Visual Regression Pixel Diff theo thống nhất Scope Freeze Phase 1).
   > 3. Lập danh sách coverage gaps cho các tương tác người dùng quan trọng."
 - **Prompt bổ sung cho S06 (Candidate Generation)**:
   > "Khi sinh TestCandidate cho UI:
@@ -947,15 +947,16 @@ timeout_seconds: 300
 
 | Domain | Ứng viên Công cụ / Thư viện | Loại hình | Cơ chế Tích hợp vào TI Worker / Gateway | Bằng chứng Thu thập (S08 Evidence) |
 | :--- | :--- | :--- | :--- | :--- |
-| **API** | **Hurl** *(Rust-based)* | Binary CLI | Đóng gói vào Worker container; thực thi qua execution grant; native JSONPath/regex assertions và capture headers/mTLS. | HTTP status, headers, SHA-256 body hash, latency ms. |
-| **API** | **httpx + pydantic** | Python Library | Nhúng trực tiếp vào tiến trình TI Job Worker; kiểm soát timeout ms và mTLS. | Kết quả validate schema, status, response hash. |
-| **Database** | **Testcontainers** *(Python/Go)* | Container Sandbox | Worker gọi Docker socket nội bộ dựng ephemeral container DB (Postgres/MySQL) sạch cho từng job; chạy test xong tự hủy. | Log migration, schema checksum sau khi chạy, query plan digest. |
-| **Database** | **SQLAlchemy + asyncpg** | Python Library | Module thực thi query trong worker với transaction mode `READ ONLY` và `ROLLBACK` bắt buộc. | Row count, column metadata, hash tập kết quả (result set hash). |
-| **UI** | **ti-playwright Container** | Container Service | Nâng cấp từ MCP hiện tại thành Playwright Worker độc lập trong VPC nội bộ; hỗ trợ full-page screenshot và trace.zip. | PNG Screenshot (S3 URI + SHA-256), Playwright trace file, console errors. |
-| **UI** | **Axe-core Playwright** | Node/Python Lib | Tích hợp vào Playwright runner script để kiểm tra tự động các vi phạm WCAG 2.1 A/AA/AAA. | Danh sách vi phạm accessibility (JSON format). |
-| **UI** | **Pixelmatch / Resemble.js** | Node/Python Lib | So khớp từng pixel giữa ảnh chụp thực tế và Golden Baseline Image để ra tỷ lệ phần trăm sai lệch khách quan. | Tỷ lệ mismatch percentage và visual diff image hash. |
-| **Performance**| **k6 (Grafana)** | Go Binary CLI | Đóng gói thành container `ti-k6-runner`; chạy kịch bản stages và tự động đối chiếu native Thresholds (P95/P99). | `summary.json`, latency percentiles, error rate, RPS. |
+| **API (Flows)** | **Playwright API / httpx** | Runner Library | Thực thi các kịch bản business flow từ S06 JSON candidate (`SCHEMA_AND_FUNCTIONAL`); native JSONPath/regex assertions và headers/mTLS. | HTTP status, headers, SHA-256 body hash, latency ms. |
+| **API (Fuzzing)**| **Schemathesis** *(Task 1)* | AWS CodeBuild / CLI | Tự động fuzzing 100% từ OpenAPI schema để phát hiện lỗi sập (HTTP 500) mà không tốn token AI. | Coverage report, HTTP 500 failure trace, raw request/response. |
+| **Database** | **Amazon Aurora Serverless v2 Clone** | AWS Managed DB | Tạo ephemeral DB clone (<60s) từ snapshot staging/prod, không phụ thuộc Docker socket, hỗ trợ nạp DB lớn an toàn. | Checksum schema sau migration, execution plan digest, rollback log. |
+| **Database** | **Flyway + SQLAlchemy** | ECS Fargate / Python | Flyway chạy script migration; SQLAlchemy chạy query read-only kiểm tra `information_schema` với transaction `ROLLBACK`. | Row count, column metadata, hash tập kết quả (result set hash). |
+| **UI** | **Playwright trên CloudWatch Synthetics / Fargate** | Serverless / Container | Chạy kịch bản user journey Playwright; hỗ trợ full-page screenshot, trace.zip và console log capture. | PNG Screenshot (S3 URI + SHA-256), Playwright trace file, console errors. |
+| **UI (A11y)** | **Axe-core Playwright** | Node/Python Lib | Tích hợp vào Playwright runner script để kiểm tra tự động các vi phạm WCAG 2.1 A/AA. | Danh sách vi phạm accessibility (JSON format). |
+| **UI (Visual)**| *Đã loại bỏ (Out-of-Scope Phase 1)* | — | Cắt giảm Pixelmatch / Resemble.js theo thống nhất Scope Freeze giữa Task 1, Task 2 và Task 4. | Không áp dụng trong Phase 1. |
+| **Performance**| **AWS DLT + k6 Engine trên Fargate** | AWS Solution / CLI | Điều phối k6 qua Distributed Load Testing (DLT) trên ECS Fargate; tự động đối chiếu server-enforced Thresholds (P95/P99). | `summary.json`, latency percentiles, error rate, RPS. |
 | **Performance**| **Prometheus / CloudWatch Exporter** | API Collector | Adapter truy vấn telemetry của target service trong suốt thời gian chạy tải để đo tương quan tiêu thụ CPU/RAM. | Snapshot biểu đồ sử dụng tài nguyên hạ tầng. |
-| **Security** | **Semgrep OSS** | SAST CLI | Đóng gói thành container `ti-security-semgrep`; chạy quét tĩnh với ruleset YAML offline; xuất chuẩn SARIF. | File `results.sarif`, SHA-256 digest, danh sách CWE. |
+| **Security** | **Amazon CodeGuru Security & Inspector** *(Task 1)* | AWS Managed Service | Quét diff PR, phân tích lỗ hổng mã nguồn bằng ML của AWS và quét CVE thư viện tự động. | SARIF findings, severity, CWE IDs. |
+| **Security** | **Semgrep OSS** | SAST CLI (Isolated) | Đóng gói thành container `ti-security-semgrep` (network: none); chạy quét tĩnh với ruleset YAML offline; xuất chuẩn SARIF. | File `results.sarif`, SHA-256 digest, danh sách CWE. |
 | **Security** | **Trivy (Aqua Security)**| SCA / CVE CLI | Quét dependencies lockfiles, base images và phát hiện CVE đã biết; xuất chuẩn SARIF/JSON. | Danh sách CVE IDs, CVSS scores, package version. |
 | **Security** | **Gitleaks** | Secret CLI | Quét tìm API keys, credentials bị hardcode trong Git diff trước khi nạp artifact vào pipeline. | Danh sách phát hiện secret lộ lọt (file, line, type). |

@@ -39,7 +39,7 @@
 ### 1. API TESTING
 - **Test Candidate Chạy Thật**: `target_operation_ref` (không hardcode URL), `http_method`, `payload_template`, tập hợp `deterministic_assertions`: (1) `HTTP_STATUS` == 201; (2) `JSON_PATH` `$.order_id` regex `^ORD-[0-9]{8}$`; (3) `RESPONSE_TIME_MS` <= 800. Bắt buộc có chính sách băm SHA-256 body và sanitize token.
 - **Prompt S05 (Planning)**:
-  > "Phân tích OpenAPI/Swagger diff giữa base và head để tìm direct & indirect impacted endpoints. Lập kế hoạch 4 tầng: (1) Contract Validation (fields mới, types, required); (2) Happy Path Flow; (3) Boundary & Negative Input (null, rỗng, số âm, sai type); (4) Idempotency Check. Chỉ định rõ coverage gaps cho S06."
+  > "Phân tích OpenAPI/Swagger diff giữa base và head để tìm direct & indirect impacted endpoints. Lập kế hoạch 4 tầng: (1) Schema Validation (fields mới, types, required); (2) Happy Path Flow; (3) Boundary & Negative Input (null, rỗng, số âm, sai type); (4) Idempotency Check. (Ủy thác fuzzing diện rộng cho Schemathesis; S05/S06 tập trung sâu vào flow nghiệp vụ cho Playwright API runner)."
 - **Prompt S06 (Generation)**:
   > "Sinh candidate theo đúng JSON schema `API_CANDIDATE_V1`. Không sinh text tự do. Bắt buộc tối thiểu 3 deterministic assertions: Status code chuẩn, ít nhất 1 JSONPath kiểm tra field đặc trưng, và trần latency ms. Cấm bịa URL hoặc credential, chỉ dùng `target_operation_ref` và placeholder `{{server_bound_auth}}`."
 - **Model Tier**: S05 dùng **Sonnet 5** | S06 dùng **Haiku 4.5** (workflow phức tạp dùng Sonnet 5).
@@ -105,11 +105,11 @@
 
 | Domain | Công cụ Đề xuất | Loại hình | Cơ chế Tích hợp vào TI Platform | Bằng chứng Thu thập (S08 Evidence) |
 | :--- | :--- | :--- | :--- | :--- |
-| **API** | **Hurl** / `httpx` | Rust CLI / Python Lib | Đóng gói vào Worker; assert JSONPath, regex, mTLS và headers. | HTTP status, headers, SHA-256 body hash, latency ms. |
-| **Database** | **Testcontainers** + SQLAlchemy | Docker Sandbox / Lib | Dựng DB container (Postgres/MySQL) sạch cho từng job; chạy test xong tự hủy; transaction rollback. | Log migration, schema checksum, query result set hash. |
-| **UI** | **ti-playwright Container** + Axe-core | Container Service | Playwright Worker trong VPC nội bộ; hỗ trợ full-page screenshot, trace.zip và WCAG 2.1 A11y audit. | PNG Screenshot (S3 + SHA-256), trace file, console errors list. |
-| **Performance**| **k6 (Grafana)** | Go Binary CLI | Container `ti-k6-runner`; chạy kịch bản stages, kiểm soát VUs và đối chiếu native Thresholds P95/P99. | `summary.json`, latency percentiles, error rate, RPS. |
-| **Security** | **Semgrep** + **Trivy** + **Gitleaks** | SAST/SCA/Secret CLI | Chạy trong container cách ly không mạng (`--network none`), quét offline và xuất SARIF chuẩn. | File `results.sarif`, SHA-256 digest, danh sách CWE & CVE IDs. |
+| **API** | **Playwright API** + **Schemathesis** | Runner / AWS CodeBuild | Schemathesis fuzzing tự động từ OpenAPI; Playwright API chạy flows nghiệp vụ phức tạp từ S06. | HTTP status, headers, SHA-256 body hash, latency ms. |
+| **Database** | **Aurora Serverless v2 Clone** + Flyway/SQLAlchemy | AWS Managed / Python | Tạo DB clone tạm thời (<60s) từ snapshot; Flyway chạy migration; SQLAlchemy chạy query kiểm tra với rollback. | Log migration, schema checksum, query result set hash. |
+| **UI** | **Playwright trên CloudWatch / Fargate** + Axe-core | Serverless / Container | Playwright chạy user journeys; full-page screenshot, trace.zip và WCAG 2.1 A11y audit (đã bỏ Visual Regression pixel diff). | PNG Screenshot (S3 + SHA-256), trace file, console errors list. |
+| **Performance**| **AWS DLT + k6 Engine trên Fargate** | AWS Solution / CLI | Điều phối k6 qua Distributed Load Testing (DLT); kiểm soát VUs và đối chiếu native Thresholds server-enforced. | `summary.json`, latency percentiles, error rate, RPS. |
+| **Security** | **CodeGuru & Inspector** + **Semgrep/Trivy/Gitleaks** | AWS ML + SAST/SCA CLI | Kết hợp CodeGuru/Inspector quét diff AWS và container Semgrep/Trivy/Gitleaks chạy cách ly không mạng (`--network none`). | SARIF findings, SHA-256 digest, danh sách CWE & CVE IDs. |
 
 ---
 
