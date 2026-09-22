@@ -232,7 +232,7 @@ flowchart TD
         S03["S03: Impact Engine\n(Đồ thị phụ thuộc)"]
         S04["S04: Risk Engine\n(Xác định Risk Tier)"]
         
-        Tool_Sec["★ 1. Amazon CodeGuru Security\n+ Amazon Inspector\n(Quét SAST PR Diff & Lỗ hổng CVE)"]
+        Tool_Sec["★ 1. AWS CodeBuild / Lambda\n+ Semgrep & Trivy\n(Quét SAST Diff, Secrets & CVE Thư viện)"]
     end
 
     subgraph Phase2["Giai đoạn 2: Lập kế hoạch & Sinh Test (S05 - S06)"]
@@ -260,7 +260,7 @@ flowchart TD
     %% Luồng kết nối dữ liệu
     PR --> S01 --> S02 --> S03 --> S04
     S02 -.->|Gửi code diff| Tool_Sec
-    Tool_Sec -.->|Báo cáo lỗi bảo mật| S04
+    Tool_Sec -.->|Báo cáo lỗi bảo mật & CVE| S04
 
     S04 --> S05_06
     S05_06 -.->|Kiểm định candidate| Tool_AI
@@ -277,7 +277,7 @@ flowchart TD
     R_UI -->|Ảnh PNG từng bước, HAR, Video| S08
     R_DB -->|Log Migration & Bảng Diff DB| S08
     R_Perf -->|Metrics p95/p99 SLA JSON| S08
-    Tool_Sec -->|JSON danh sách lỗ hổng CVE| S08
+    Tool_Sec -->|JSON danh sách lỗ hổng CVE & SAST| S08
 
     S08 --> S09 --> S10
 ```
@@ -286,7 +286,7 @@ flowchart TD
 
 | Chặng Pipeline TI | Công cụ / Dịch vụ AWS tích hợp | Cơ chế hoạt động trong Pipeline | Bằng chứng đẩy về S08 Evidence Store |
 | :--- | :--- | :--- | :--- |
-| **S02 $\rightarrow$ S04** *(Rủi ro)* | **Amazon CodeGuru Security + Amazon Inspector** | Tự động quét code diff của PR tìm lỗi OWASP/SQLi và quét tệp package tìm mã CVE. | File JSON thống kê danh sách lỗ hổng bảo mật, cung cấp số liệu cho `Risk Tier`. |
+| **S02 $\rightarrow$ S04** *(Rủi ro)* | **AWS CodeBuild / Lambda + Semgrep & Trivy** | Tự động quét code diff của PR tìm lỗi OWASP/SQLi (Semgrep) và quét tệp package tìm mã CVE, secret lộ lọt (Trivy). | File JSON chuẩn hóa danh sách lỗ hổng bảo mật, cung cấp số liệu định lượng cho `Risk Tier`. |
 | **S05 / S06** *(Sinh test)* | **Amazon Bedrock Evaluations** (`TIRunnerGroundness`) | Chấm điểm các test case do AI sinh ra, đảm bảo bám sát artifact và không bịa đặt API. | Điểm số `GroundednessScore` & `GoalSuccessRate` (từ 0.0 đến 1.0). |
 | **S07** *(API Testing)* | **AWS CodeBuild / Lambda + Schemathesis & Playwright API** | Fuzzing tự động hàng nghìn request từ file OpenAPI và chạy kịch bản chức năng tích hợp. | File JSON vi phạm schema, mã lỗi HTTP 500 kèm cURL command tái hiện lỗi. |
 | **S07** *(UI/Web Testing)* | **Amazon CloudWatch Synthetics + Playwright & axe-core** | Chạy kịch bản E2E kiểm tra luồng người dùng trên trình duyệt không máy chủ; quét WCAG a11y. | Ảnh chụp màn hình hoàn thành từng bước, Video lượt chạy, file HAR network và log Console. |
@@ -314,12 +314,17 @@ flowchart TD
   * Tích hợp **axe-core** tự động bắt lỗi vi phạm chuẩn tiếp cận (Accessibility WCAG).
 * **Evidence sinh ra cho S08:** Ảnh chụp màn hình hoàn thành từng bước, file HAR network ghi nhận request/response, video lượt chạy và log Console.
 
-#### 3. Security & Static Risk Analysis: Amazon CodeGuru Security + Amazon Inspector
-* **Dịch vụ AWS:** **Amazon CodeGuru Security** và **Amazon Inspector**.
+#### 3. Security & Static Risk Analysis: AWS CodeBuild / Lambda + Semgrep & Trivy (Thay thế CodeGuru đã EOL)
+* **Dịch vụ AWS:** **AWS CodeBuild** hoặc **AWS Lambda** (chạy micro-runner container).
+* **Công cụ kết hợp:** **Semgrep** (quét SAST tĩnh trên Git diff) và **Trivy** (quét lỗ hổng CVE dependencies & hardcoded secrets).
+* **Lý do thay thế Amazon CodeGuru:**
+  * Dịch vụ Amazon CodeGuru (Reviewer & Profiler) đã chính thức dừng hoạt động (End of Life từ 20/11/2025). Việc dùng dịch vụ SaaS độc quyền của đám mây tiềm ẩn rủi ro thay đổi roadmap và chi phí cao.
+  * Mặc dù AWS ra mắt **Amazon Q Developer**, công cụ này được thiết kế tương tác người dùng trên IDE và thu phí theo user ($19/user/tháng), không tối ưu cho kiến trúc gọi API tự động (machine-to-machine headless) của backend TI.
 * **Giải quyết bài toán của TI:**
-  * Chặng **S04 (Risk Engine)** của TI hiện đang dựa vào LLM (Claude) đọc diff code để đoán rủi ro `RegressionRisk` ([TI API.pdf - trang 24](file:///c:/Users/LENOVO/TI/TI%20API.pdf)), rất dễ bị ảo giác hoặc bỏ sót.
-  * CodeGuru Security phân tích trực tiếp PR diff bằng Machine Learning của AWS để tìm lỗ hổng bảo mật (OWASP Top 10, SQL Injection, hardcoded secrets). Inspector quét tệp phụ thuộc tìm mã lỗ hổng CVE đã công bố.
-* **Evidence sinh ra cho S08:** Báo cáo định lượng danh sách lỗ hổng bảo mật dạng JSON. Giúp S04 tự động nâng hạng **`Risk Tier: CRITICAL`** chính xác 100%.
+  * Chặng **S04 (Risk Engine)** của TI cần dữ liệu rủi ro định lượng để tính điểm `RegressionRisk` ([TI API.pdf - trang 24](file:///c:/Users/LENOVO/TI/TI%20API.pdf)), tránh để LLM (Claude) đoán mò rủi ro (dễ ảo giác hoặc tốn token).
+  * **Semgrep** quét trực tiếp trên Git diff của PR chỉ trong **2–5 giây**, phát hiện lỗi OWASP Top 10, SQLi, logic hở.
+  * **Trivy** kiểm tra tệp phụ thuộc (`package.json`, `requirements.txt`, `pom.xml`) để phát hiện các mã CVE mới nhất và quét lộ lọt API key/tokens.
+* **Evidence sinh ra cho S08:** Báo cáo định lượng danh sách lỗ hổng bảo mật dạng JSON chuẩn 100% (gồm file, dòng code, mã CWE/CVE, mức độ Critical/High). Giúp S04 tự động nâng hạng **`Risk Tier: CRITICAL`** chính xác, không phụ thuộc vào LLM.
 
 #### 4. Database & Integration Testing: Amazon Aurora Serverless v2 Cloning + AWS ECS Fargate
 * **Dịch vụ AWS:** **Amazon Aurora Serverless v2** (tính năng **Database Cloning**) và **AWS ECS Fargate**.
@@ -401,8 +406,8 @@ flowchart TD
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **SonarQube** | Nền tảng phân tích mã nguồn tĩnh (SAST) truyền thống. | Thường quét toàn bộ kho mã nguồn định kỳ hoặc sau khi merge code. | Quản lý chất lượng mã tập trung, tính toán nợ kỹ thuật (Technical Debt) trực quan. | Chậm, sinh nhiều cảnh báo rác (false positives); phải tự duy trì server SonarQube riêng. | Community: Free; Developer/Enterprise: **\$150 - \$1,000+/tháng**. | **Không chọn**: Quá cồng kềnh, không phù hợp cho việc phân tích nhanh gọn theo từng PR của TI. |
 | **OWASP ZAP** | Trình quét lỗ hổng ứng dụng web động (DAST) ngoài mạng. | Bắn request tấn công thử nghiệm từ bên ngoài vào web đang chạy. | Phát hiện tốt các lỗi runtime (SQLi, XSS, sai cấu hình header, cookie bảo mật). | Chỉ quét được tầng ngoài khi app đã deploy; không chỉ ra được dòng code cụ thể bị lỗi. | **Mã nguồn mở miễn phí 100%**. | **Không chọn làm lõi**: Không giải quyết được bài toán phân tích rủi ro trực tiếp từ artifact mã nguồn. |
-| **Semgrep (CLI độc lập)** | Bộ phân tích cú pháp mã nguồn tĩnh (SAST) thế hệ mới. | Quét trực tiếp trên tệp mã nguồn hoặc git diff trong vài giây. | Cực nhanh, dễ viết rule riêng theo chuẩn doanh nghiệp; ít báo động giả. | Không tự động phân tích sâu được luồng dữ liệu phức tạp (data flow) xuyên tệp. | Community: Free; Team: **\$25/dev/tháng**. | **Dùng làm bổ trợ**: Phù hợp để viết thêm các custom rules bảo mật đặc thù riêng cho TI. |
-| **LỰA CHỌN TI: Amazon CodeGuru Security + Inspector** | Dịch vụ phân tích mã nguồn bằng AI/ML chuyên sâu của AWS. | Gọi qua API ngay khi PR mở tại chặng **S02/S04** của pipeline TI. | • Đọc trực tiếp PR diff bằng Machine Learning.<br>• Tìm chính xác lỗi OWASP và lỗ hổng CVE thư viện.<br>• Xuất JSON cho Risk Engine. | Phụ thuộc vào các ngôn ngữ được AWS hỗ trợ chính thức (Java, Python, JS, TS, Go). | • CodeGuru: **\$10 cho mỗi 100,000 dòng code quét full** (diff nhỏ tốn vài cent).<br>• Inspector: **\$0.30 / container scan**. | **LỰA CHỌN CỐT LÕI BẢO MẬT:** Cung cấp bằng chứng định lượng chính xác để chặng S04 tính toán `Risk Tier` mà không sợ AI bị ảo giác. |
+| **Amazon Q Developer (Kế nhiệm CodeGuru đã EOL)** | Trợ lý AI và quét bảo mật mã nguồn thế hệ mới của AWS. | Quét qua IDE hoặc bot comment trực tiếp lên PR GitHub/GitLab. | Tích hợp GenAI của AWS, tự động đề xuất code sửa lỗi (auto-remediation). | Tối ưu cho người dùng IDE, khó gọi headless API máy-với-máy từ backend TI; cần quản lý Identity Center. | **\$19 / lập trình viên / tháng** (Bản Pro cố định, rất đắt nếu quy mô lớn). | **Không chọn làm lõi**: Mô hình định giá theo user không khớp với cơ chế pay-as-you-go của TI; khó tích hợp ngầm. |
+| **LỰA CHỌN TI: AWS CodeBuild / Lambda + Semgrep & Trivy** | CLI SAST & CVE scanner chuẩn công nghiệp chạy trên serverless container AWS. | Gọi lệnh CLI quét ngầm ngay khi PR mở tại chặng **S02/S04** của pipeline TI. | • **Quét Git diff siêu tốc (2–5s)**.<br>• Tự động xuất JSON chuẩn cho S08.<br>• Tự viết custom rules bằng YAML.<br>• Không bao giờ lo bị khai tử. | Không tự động phân tích sâu được luồng dữ liệu phức tạp (data flow) xuyên tệp nếu dùng bản free. | • Semgrep & Trivy: **Miễn phí 100%**.<br>• CodeBuild: **~\$0.0008 / lượt quét diff 10s** (tiết kiệm 95% so với Amazon Q). | **LỰA CHỌN TỐI ƯU BẢO MẬT:** Cung cấp bằng chứng định lượng chính xác cho S04, tốc độ tức thì, 0 đồng bản quyền, tránh hoàn toàn Vendor Lock-in. |
 
 ---
 
@@ -422,7 +427,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **1. Kiểm thử API** | **AWS CodeBuild + Schemathesis & Playwright API** | S05/S06 & S07 | File JSON ghi nhận vi phạm schema & HTTP 500 cURL | CodeBuild: **\$0.005 / phút** (100 phút đầu free/tháng) | Tự động fuzzing tìm edge-cases mà không cần con người viết test tay. |
 | **2. Kiểm thử Giao diện Web (UI E2E)** | **CloudWatch Synthetics + Playwright** | S07 | Ảnh PNG các bước, Video lượt chạy, HAR traffic, axe a11y JSON | **\$0.0012 / lượt chạy Canary** (100 lượt đầu free/tháng) | Kiểm thử E2E không máy chủ, tự động ghi nhận lỗi runtime và chuẩn tiếp cận. |
-| **3. Kiểm thử Bảo mật & Rủi ro** | **Amazon CodeGuru Security + Inspector** | S02 & S04 | File JSON báo cáo lỗ hổng CVE/CWE, điểm rủi ro | **~\$0.01 - \$0.05 / lượt PR diff** (theo số dòng code thay đổi) | Cung cấp bằng chứng định lượng giúp S04 xếp hạng `Risk Tier` chuẩn xác 100%. |
+| **3. Kiểm thử Bảo mật & Rủi ro** | **AWS CodeBuild / Lambda + Semgrep & Trivy** | S02 & S04 | File JSON chuẩn hóa danh sách lỗ hổng CVE/CWE, Secrets | Bản quyền **\$0**; CodeBuild: **~\$0.001 / lượt quét diff 10s** | Cung cấp bằng chứng định lượng giúp S04 xếp hạng `Risk Tier` chuẩn xác 100%, tốc độ 2-5s, không lo EOL. |
 | **4. Kiểm thử Cơ sở dữ liệu** | **Aurora Serverless v2 Clone + Fargate** | S07 | Log thực thi migration, bảng diff dữ liệu trước/sau test | Clone: **\$0**; ACU: **~\$0.12/giờ** (chạy vài phút rồi xóa: **< \$0.02**) | Nhân bản DB Staging trong < 60s để test an toàn tuyệt đối trước khi merge. |
 | **5. Kiểm thử Hiệu năng** | **AWS Distributed Load Testing + k6** | S07 & CI nội bộ | File JSON phân vị độ trễ (p95/p99), biểu đồ Throughput RPS | Fargate: **~\$0.05 - \$0.15 cho mỗi đợt test tải 5 phút** | Phát hiện suy thoái hiệu năng và kiểm tra sức chịu tải của chính TI API (:8000). |
 | **6. Đánh giá Mô hình AI** | **Amazon Bedrock Evaluations** | S05/S06 | Điểm số `GroundednessScore`, `AccuracyScore` (0.0 - 1.0) | Token Bedrock: **vài cent / lượt kiểm định** | Đảm bảo AI Claude không bị ảo giác và sinh test case có căn cứ thực tế. |
