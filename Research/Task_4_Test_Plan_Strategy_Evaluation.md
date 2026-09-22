@@ -5,8 +5,8 @@
 
 | Thuộc tính | Giá trị |
 | :--- | :--- |
-| **Document Status** | Draft v1.0 — Trình bày nội bộ nhóm |
-| **Version** | v1.0.0 |
+| **Document Status** | Draft v1.1 — Đã review & cập nhật 8 issues |
+| **Version** | v1.1.0 |
 | **Date** | 22 September 2026 |
 | **Author** | Hùng — Nhóm 4 (Testing Strategy) |
 | **Cơ sở lý luận** | ISTQB CTFL v4.0.1 · CT-AI v2.0 · CT-GenAI v1.1 |
@@ -102,15 +102,18 @@ TI đồng thời là:
 
 #### 3.1.1. Trong phạm vi (In-Scope)
 
-| Domain | Đối tượng kiểm thử | Test Level | Công cụ (từ Task 1) |
-| :--- | :--- | :--- | :--- |
-| **API Functional & Fuzzing** | TI API (:8000) và API của artifact tenant | Integration + System | Schemathesis + AWS CodeBuild/Lambda |
-| **UI / Web E2E** | TI Portal (:8001) và Web App của tenant | System + Acceptance | CloudWatch Synthetics + Playwright + axe-core |
-| **Database Migration** | Script migration của PR tenant | Component + Integration | Aurora Serverless v2 Clone + ECS Fargate + Flyway |
-| **Performance & Load** | TI API và Service của tenant dưới tải | System + Performance | AWS DLT + k6 Engine trên Fargate |
-| **Security & Static Risk** | Code diff của PR, dependencies lockfile | Component (Static) | Amazon CodeGuru Security + Inspector + Semgrep + Trivy |
-| **AI Model Quality** | Claude model sinh test case (S05/S06) | AI Model Testing | Amazon Bedrock Evaluations (`TIRunnerGroundness`) |
-| **AI Behavior / Prompt Injection** | Input artifact từ tenant (OpenAPI, SQL, HTML) | Security Testing | Context Isolation layers (4-barrier defense) |
+| Domain | Đối tượng kiểm thử | Test Level | Công cụ (từ Task 1) | Vị trí trong pipeline |
+| :--- | :--- | :--- | :--- | :--- |
+| **API Functional & Fuzzing** | TI API (:8000) và API của artifact tenant | Integration + System | Schemathesis + AWS CodeBuild/Lambda | S07 Runner |
+| **UI / Web E2E** | TI Portal (:8001) và Web App của tenant | System + Acceptance | CloudWatch Synthetics + Playwright + axe-core | S07 Runner |
+| **Database Migration** | Script migration của PR tenant | Component + Integration | Aurora Serverless v2 Clone + ECS Fargate + Flyway | S07 Runner |
+| **Performance & Load** | TI API và Service của tenant dưới tải | System + Performance | AWS DLT + k6 Engine trên Fargate | S07 Runner |
+| **Security SAST/SCA/Secret** | Code diff của PR, dependencies lockfile | Component (Static) | **Semgrep OSS + Trivy + Gitleaks** — chạy container offline `--network none`, output SARIF | **S07 Runner** (W1) |
+| **Risk Scoring (không phải runner)** | PR diff và dependency graph | Static Analysis | **Amazon CodeGuru Security + Inspector** — gọi qua API, output JSON risk score | **S02 → S04** (input cho Risk Engine, không phải runner S07) |
+| **AI Model Quality** | Claude model sinh test case (S05/S06) | AI Model Testing | Amazon Bedrock Evaluations (`TIRunnerGroundness`) | S05/S06 → S08 |
+| **AI Behavior / Prompt Injection** | Input artifact từ tenant (OpenAPI, SQL, HTML) | Security Testing | Context Isolation layers (4-barrier defense) | S02 Artifact Intake |
+
+> ⚠️ **Phân biệt quan trọng:** CodeGuru Security + Inspector thuộc chặng **S02→S04** (cung cấp risk score cho Risk Engine), **không phải** security runner trong S07. Security runner trong S07 là Semgrep + Trivy + Gitleaks. Xem thêm Task 1 (Trang) — bảng ánh xạ vị trí pipeline.
 
 #### 3.1.2. Ngoài phạm vi (Out-of-Scope) — với lý do
 
@@ -148,7 +151,7 @@ TI đồng thời là:
 | :--- | :--- | :--- |
 | **Functional** | EP (Equivalence Partitioning) + BVA (Boundary Value Analysis) | Schemathesis tự động sinh boundary payload từ OpenAPI schema → tương đương BVA tự động hóa |
 | **Non-functional / Performance** | Stress Testing + Spike Testing + Load Testing | k6 stages: Ramp-up → Hold → Ramp-down; VUs không vượt quota (tránh Self-inflicted DoS) |
-| **Security** | White-box SAST + Experience-based (Exploratory) | Semgrep/Trivy chạy trên code, Opus 5 làm Threat Modeling (Red Team layer) |
+| **Security** | White-box SAST + Experience-based (Exploratory) | Semgrep/Trivy/Gitleaks chạy offline trong S07; **Opus 5 BẮT BUỘC cho S05 Threat Modeling** (theo Task 3 — Capability Manifest `BEDROCK.CLAUDE_OPUS_5@1`); Haiku 4.5 tóm tắt SARIF findings cho S09 |
 | **Regression** | State Transition Testing (Order status lifecycle) | Mỗi PR trigger lại toàn bộ pipeline S01–S10 → Automatic regression |
 | **AI-specific: Adversarial** | Adversarial Testing (CT-AI §5.3.1) | Bơm payload đặc biệt (null, emoji, SQL-in-JSON) vào API runner |
 | **AI-specific: Metamorphic** | Metamorphic Testing (CT-AI §5.3.3) | Thay đổi field không quan trọng của input → output phải nhất quán |
@@ -185,11 +188,16 @@ TI đồng thời là:
 TI không test tất cả mọi thứ với cùng cường độ. Chiến lược phân tầng dựa trên **Risk Tier** (từ S04) và **đặc tính AI Quality** (từ CT-AI):
 
 ```
-Risk Tier CRITICAL  → Chạy TẤT CẢ 5 domain runners + Opus 5 Threat Modeling
-Risk Tier HIGH      → Chạy API + Security + domain bị ảnh hưởng trực tiếp
-Risk Tier MEDIUM    → Chạy API + Smoke test UI + Static security scan
-Risk Tier LOW       → Chỉ chạy Static scan (CodeGuru) + Schema validation
+Risk Tier CRITICAL  → Chạy TẤT CẢ 6 domain runners:
+                       API + UI + DB + Perf + Security (SAST/SCA) + AI Model Quality (Bedrock Eval)
+                       + Opus 5 Threat Modeling (bắt buộc)
+Risk Tier HIGH      → Chạy API + Security (SAST/SCA) + domain bị ảnh hưởng trực tiếp
+                       + AI Model Quality nếu prompt thay đổi
+Risk Tier MEDIUM    → Chạy API + Smoke test UI + Static security scan (Semgrep/Trivy)
+Risk Tier LOW       → Chỉ chạy CodeGuru static scan (S02→S04) + Schema validation
 ```
+
+> **Lưu ý 6 domains:** (1) API, (2) UI/Web, (3) Database, (4) Performance, (5) Security SAST/SCA, (6) AI Model Quality (Bedrock Evaluations). Amazon CodeGuru Security + Inspector là pre-runner ở S02→S04, không tính vào 6 domain runners.
 
 ### 4.2. Strategy theo từng Domain
 
@@ -265,9 +273,9 @@ Risk Tier LOW       → Chỉ chạy Static scan (CodeGuru) + Schema validation
 | Kỹ thuật | Nguồn | Cách triển khai trong TI |
 | :--- | :--- | :--- |
 | **State Transition** (CTFL §4.4) | CTFL | Test trạng thái UI: `Loading → Loaded → Error → Retry` |
-| **User Journey Testing** (CTFL §4.5) | CTFL | Kịch bản end-to-end: đăng nhập → thao tác → xác nhận kết quả |
-| **Accessibility Testing** (CT-AI §4.2 — Usability) | CT-AI | axe-core tự động scan WCAG 2.1 AA violations sau mỗi bước |
-| **Visual Evidence Review** (CT-GenAI §4.3) | CT-GenAI | Claude Sonnet 5 Vision phân tích screenshot nếu có layout anomaly |
+| **Use Case / User Journey Testing** (CTFL §4.5) | CTFL | Kịch bản end-to-end: đăng nhập → thao tác → xác nhận kết quả |
+| **Accessibility — Usability Characteristic** (CT-AI §4.1) | CT-AI | axe-core tự động scan WCAG 2.1 AA violations sau mỗi bước; Usability là một trong 6 AI Quality Characteristics |
+| **Visual Evidence Reasoning** (Design Decision — CT-GenAI §5 Multi-modal Eval) | CT-GenAI §5 | Claude Sonnet 5 Vision phân tích screenshot khi có layout anomaly — đây là ứng dụng GenAI vào đánh giá bằng chứng trực quan, không phải kỹ thuật UI testing truyền thống |
 
 **Selector Strategy** (bắt buộc tuân thủ):
 - ✅ Ưu tiên: `data-testid` hoặc `ROLE_AND_NAME` (WAI-ARIA)
@@ -294,15 +302,17 @@ Risk Tier LOW       → Chỉ chạy Static scan (CodeGuru) + Schema validation
 | **Concurrency Stress** | CT-AI §6.1 — Deployment Testing | Ramp: 0→50 VUs in 30s · Hold 60s · Ramp-down 30s |
 | **Spike Test** | CT-AI §6.1 | 0→100 VUs in 5s · Hold 15s (mô phỏng flash submission) |
 
-**Ngưỡng SLO** (server-owned từ Evaluation Pack — không chấp nhận từ artifact):
+**Ngưỡng SLO** — **server-owned từ Evaluation Pack per-tenant**, không được hard-code trong chiến lược:
 
-| Metric | Ngưỡng PASS | Hành động nếu vượt |
-| :--- | :--- | :--- |
-| P95 latency | ≤ 500ms | `DO_NOT_PASS` |
-| P99 latency | ≤ 1000ms | `HOLD` (cần manual review) |
-| Error rate | < 1% | `DO_NOT_PASS` |
-| Throughput | ≥ 150 RPS | `HOLD` |
-| CPU saturation | ≤ 85% | `HOLD` |
+> ⚠️ **Nguyên tắc bất biến (Task 3 + Architecture Law 6):** Toàn bộ ngưỡng SLO để ra quyết định Gate tại S09 **phải được nạp từ `Evaluation Pack` của Server**. Không chấp nhận ngưỡng từ artifact PR, không hard-code constant trong strategy document. Mỗi tenant type (Fintech / Healthcare / SaaS) có bộ ngưỡng riêng.
+
+| Metric | Placeholder tham chiếu | Hành động nếu vượt | Ghi chú |
+| :--- | :--- | :--- | :--- |
+| P95 latency | `${EVAL_PACK.perf.p95_ms}` | `DO_NOT_PASS` | Giá trị ví dụ (Fintech): 500ms — phải set trong Evaluation Pack |
+| P99 latency | `${EVAL_PACK.perf.p99_ms}` | `HOLD` | Giá trị ví dụ (Fintech): 1000ms |
+| Error rate | `${EVAL_PACK.perf.error_rate_pct}` | `DO_NOT_PASS` | Giá trị ví dụ: < 1% |
+| Throughput | `${EVAL_PACK.perf.min_rps}` | `HOLD` | **Chú ý:** Không set ngưỡng RPS chung cho mọi tenant — microservice background cron sẽ không bao giờ đạt RPS cao |
+| CPU saturation | `${EVAL_PACK.infra.cpu_max_pct}` | `HOLD` | Giá trị ví dụ: 85% |
 
 **Guardrail chống Self-inflicted DoS:** `MAX_VUS = 100`, `MAX_DURATION = 300s` — hard-coded ở phía server, model không thể override.
 
@@ -333,10 +343,36 @@ Tầng 3 (Human) — Manual Penetration Testing:
 
 | Barrier | Cơ chế | Mục tiêu |
 | :--- | :--- | :--- |
-| **B1 — Tool Sandbox** | Semgrep/Trivy chạy trong container `--network none`, model không đọc code trực tiếp | Tách model khỏi data độc hại |
+| **B1 — Tool Sandbox** | Semgrep/Trivy/Gitleaks chạy trong container `--network none` (Private Subnet + Security Group Deny All + VPC Endpoints S3/ECR/CloudWatch), model không đọc code trực tiếp | Tách model khỏi data độc hại; ngắt internet hoàn toàn mà không dùng AWS Network Firewall ($280/tháng/AZ) |
 | **B2 — Sanitization** | Parser bóc tách SARIF, chỉ giữ `rule_id, severity, file, line, cve_id` | Loại bỏ injection payload trong report |
 | **B3 — Context Boxing** | Bọc findings trong `<untrusted_findings>` + system instruction | Ngăn model tuân theo chỉ thị trong data |
 | **B4 — Deterministic Gate** | `IF critical_count > 0 THEN DO_NOT_PASS` — model không thể override | Bức tường cuối không thể bypass |
+
+> **Quyết định kiến trúc egress (đồng bộ với feedback mentor → Task 2 v0.2):** Network isolation cho tất cả S07 runners dùng **Private Subnet (không route internet) + Security Group Deny All Egress + VPC Endpoints (S3, ECR, CloudWatch Logs)**. Không dùng AWS Network Firewall (~$280/tháng/AZ). Chi phí giảm từ ~$320/tháng xuống < $15/tháng mà vẫn đảm bảo sandbox hoàn toàn.
+
+**Luồng handshake S07 Orchestration** (đồng bộ với sơ đồ kiến trúc Task 2 v0.2):
+
+```
+AgentCore (us-east-1)               Job Controller (ap-southeast-1)
+     │                                       │
+     │  ToolIntent JSON                      │
+     │ ─────────────────────────────────────>│
+     │  {logical_tool_id, operation_ref,     │  1. Nhận ToolIntent
+     │   arguments (abstract), idempotency}  │  2. Validate allowlist
+     │                                       │  3. Tra cứu TenantBinding
+     │                                       │     (URL thật + Secrets từ Secrets Manager)
+     │                                       │
+     │                          ┌────────────┴──────────────────────┐
+     │                          │      Dispatch Fargate Tasks       │
+     │                          ├───────────────────────────────────┤
+     │                          │  Playwright Task  │  k6 Task      │
+     │                          │  Semgrep Task     │  Flyway Task  │
+     │                          └────────────┬──────────────────────┘
+     │                                       │
+     │  ToolObservation (rút gọn)            │  4. Raw result → SHA-256 → S3
+     │ <─────────────────────────────────────│  5. Evidence Envelope → S08
+     │                                       │  6. Return ToolObservation
+```
 
 **Exit Criteria (Zero Tolerance):**
 - `CRITICAL_COUNT == 0`
@@ -429,10 +465,49 @@ Vận dụng từ **CT-AI §5.1 (Input Data Testing)** — áp cho Evidence ch�
 
 | Gate | Vị trí trong Pipeline TI | Tiêu chí đạt | Hành động khi không đạt |
 | :--- | :--- | :--- | :--- |
-| **G1 — Evidence Schema** | Sau khi runner trả raw result | Evidence JSON phải validate theo Evidence Envelope Schema | Reject, yêu cầu runner chạy lại |
+| **G1 — Evidence Schema** | Sau khi runner trả raw result | Evidence JSON phải validate theo Evidence Envelope Schema (định nghĩa bên dưới) | Reject, yêu cầu runner chạy lại |
 | **G2 — Evidence Completeness** | Trước khi S09 chạy | 100% domain runner đã có Evidence trong S08 (hoặc runner explicitly skipped với lý do) | Block S09 |
 | **G3 — Evidence Integrity** | Tại S09 | SHA-256 hash của raw result khớp với hash trong Evidence Envelope | Invalidate Evidence, reject job |
 | **G4 — Evidence Freshness** | Tại S09 | Evidence không quá 24h tuổi (stale evidence không được dùng) | Yêu cầu re-run |
+
+**Evidence Envelope Schema** — Interface contract cho Nhóm 1 (Trang) implement G1:
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TI Evidence Envelope v1",
+  "type": "object",
+  "required": ["envelope_id", "job_id", "domain", "runner_tool", "truth_class",
+               "raw_result_s3_uri", "raw_result_sha256", "collected_at_utc",
+               "deterministic_assertions", "gate_eligible"],
+  "properties": {
+    "envelope_id":          { "type": "string", "pattern": "^EVD-[A-Z]+-[0-9]{14}-[A-Z0-9]{6}$" },
+    "job_id":               { "type": "string" },
+    "domain":               { "type": "string", "enum": ["API", "UI", "DATABASE", "PERFORMANCE", "SECURITY", "AI_MODEL"] },
+    "runner_tool":          { "type": "string" },
+    "truth_class":          { "type": "string", "enum": ["OBSERVED"] },
+    "raw_result_s3_uri":    { "type": "string", "pattern": "^s3://" },
+    "raw_result_sha256":    { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "collected_at_utc":     { "type": "string", "format": "date-time" },
+    "deterministic_assertions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "required": ["assertion_id", "result", "actual_value"],
+        "properties": {
+          "assertion_id": { "type": "string" },
+          "result":       { "type": "string", "enum": ["PASS", "FAIL"] },
+          "actual_value": {}
+        }
+      }
+    },
+    "gate_eligible":        { "type": "boolean" },
+    "skip_reason":          { "type": "string" }
+  }
+}
+```
+
+> **Quy ước đặt tên:** `EVD-API-20260922143000-A3X7K2`. Mọi runner phải emit JSON khớp schema này trước khi ghi vào S08. Nhóm 1 dùng schema JSON này làm contract cứng — không tự suy diễn schema.
 
 ### 5.5. Ground Truth Benchmark Loop
 
@@ -561,17 +636,27 @@ NGUYÊN TẮC 3 — TỪ CT-GENAI: "ĐÁNH GIÁ AI BẰNG SỐ — KHÔNG BẰNG
 
 | Priority | Action | Owner đề xuất | Input từ |
 | :--- | :--- | :--- | :--- |
-| 🔴 P0 | Định nghĩa và freeze `Evaluation Pack` (ngưỡng SLO per tenant type) | Hùng + Mentor | Task 4 này |
-| 🔴 P0 | Triển khai 4 Evidence Quality Gates vào S08 Evidence Store | Trang (Nhóm 1) | Task 1 + Task 4 |
-| 🟠 P1 | Xây dựng Ground Truth Benchmark Repo (10 repos chuẩn) | Hùng | Task 4 này |
-| 🟠 P1 | Cài đặt `token_ceiling` và `guardrail_policy` vào 3 Capability Manifests mới (DB, Perf, Security) | Nghĩa (Nhóm 3) | Task 2 + Task 4 |
-| 🟡 P2 | Viết và review tập Prompt S05/S06 cho tất cả 5 domain (dùng 6-component CT-GenAI) | Nghĩa (Nhóm 3) | Task 2 + Task 4 |
+| 🔴 P0 | Định nghĩa và freeze `Evaluation Pack` (ngưỡng SLO **per tenant type** — không hard-code) | Hùng + Mentor | Task 4 này |
+| 🔴 P0 | Triển khai 4 Evidence Quality Gates vào S08 — dùng Evidence Envelope Schema v1 trong Mục 5.4 làm contract | Trang (Nhóm 1) | Task 1 + Task 4 §5.4 |
+| 🔴 P0 | Task 2 (Hoàng): Cập nhật v0.2 theo 4 điểm mentor — Semgrep+Trivy vào W1; DB domain (Aurora Clone+Flyway); bỏ Network Firewall → Private Subnet+SG; vẽ lại sơ đồ handshake (ToolIntent → TenantBinding → Fargate tasks) | Hoàng (Nhóm 2) | Feedback mentor Task 2 |
+| 🟠 P1 | Xây dựng Ground Truth Benchmark Repo (10 repos chuẩn với known defects) | Hùng | Task 4 này |
+| 🟠 P1 | Cài đặt `token_ceiling`, `guardrail_policy` và `model_profile: BEDROCK.CLAUDE_OPUS_5@1` (Security S05) vào 3 Capability Manifests mới (DB, Perf, Security) | Nghĩa (Nhóm 3) | Task 2 + Task 4 |
+| 🟡 P2 | Viết và review tập Prompt S05/S06 cho tất cả 5 domain (dùng 6-component CT-GenAI structure) | Nghĩa (Nhóm 3) | Task 2 + Task 4 |
 | 🟡 P2 | Test và calibrate Model Tier thực tế (Haiku vs Sonnet vs Opus) trên Gold Standard Repos | Hùng + Nghĩa | Task 4 |
 | 🟢 P3 | Tích hợp Pesticide Paradox prevention vào S10 Production Learning | Hoàng (Nhóm 2) | Task 4 |
 
 ---
 
+## CHANGELOG
+
+| Version | Ngày | Thay đổi |
+| :--- | :--- | :--- |
+| v1.0.0 | 22/09/2026 | Draft ban đầu |
+| v1.1.0 | 22/09/2026 | Sửa 8 issues sau self-review + semantic review: (1) Tách CodeGuru/Inspector khỏi security runner S07; (2) SLO → tham chiếu Evaluation Pack per-tenant, bỏ hard-code; (3) Risk Tier CRITICAL: 5 → 6 domains; (4) CT-GenAI §4.3 UI → đúng CTFL §4.5 + CT-AI §4.1; (5) Bổ sung model tier Security S05 = Opus 5 bắt buộc; (6) Egress network → Private Subnet + Security Group; (7) Thêm sơ đồ handshake Job Controller → ToolIntent → Fargate; (8) Định nghĩa Evidence Envelope Schema v1 làm interface contract cho G1 |
+
+---
+
 *Document: Task_4_Test_Plan_Strategy_Evaluation.md*
 *Author: Hùng — Nhóm 4 (Testing Strategy)*
-*Date: 22 September 2026*
-*References: ISTQB CTFL v4.0.1 · CT-AI v2.0 · CT-GenAI v1.1 · Task 1 (Trang) · Task 2 & 3 (Nghĩa)*
+*Date: 22 September 2026 | Version: v1.1.0*
+*References: ISTQB CTFL v4.0.1 · CT-AI v2.0 · CT-GenAI v1.1 · Task 1 (Trang) · Task 2 (Nghĩa) · Task 3 (Nghĩa) · Task_2_Architecture_Review_Feedback.md (Mentor)*
