@@ -32,12 +32,12 @@
 
 **Chi phí ước tính:** `CANDIDATE — chưa kiểm chứng` (cần spike P4):
 
-| Hạng mục                                                         | Ước tính thô            | Nhãn                                    |
-| ---------------------------------------------------------------- | ----------------------- | --------------------------------------- |
-| Sandbox Fargate (giả định ~500 job/tháng, 5 phút/job, 2vCPU/4GB) | ~$30–60/tháng           | `INFERRED` từ giá công bố Fargate       |
-| Browser farm self-host (ECS, chạy theo job)                      | ~$50–150/tháng          | `CANDIDATE` |
-| Distributed Load Testing on AWS                                  | ~$30–90/tháng ở tải nhỏ | `CANDIDATE`                             |
-| Build effort phase W1–W2                                         | 3–5 người-tháng         | `CANDIDATE`                             |
+| Hạng mục                                                         | Ước tính thô            | Nhãn                              |
+| ---------------------------------------------------------------- | ----------------------- | --------------------------------- |
+| Sandbox Fargate (giả định ~500 job/tháng, 5 phút/job, 2vCPU/4GB) | ~$30–60/tháng           | `INFERRED` từ giá công bố Fargate |
+| Browser farm self-host (ECS, chạy theo job)                      | ~$50–150/tháng          | `CANDIDATE`                       |
+| Distributed Load Testing on AWS                                  | ~$30–90/tháng ở tải nhỏ | `CANDIDATE`                       |
+| Build effort phase W1–W2                                         | 3–5 người-tháng         | `CANDIDATE`                       |
 
 **Rủi ro lớn nhất:** Q1=Executor thuần làm chi phí/độ phức tạp cao hơn đáng kể so với hybrid (unit test L1 tự chạy trong sandbox đắt hơn nhiều so với nhận evidence từ CI consumer). → Giảm thiểu: cho phép L1/L2 nhận evidence bổ sung từ CI như chế độ phụ (đã ghi trong Charter).
 
@@ -269,12 +269,12 @@ flowchart TB
 
 ## Phụ lục A. Nguồn tham khảo
 
-| Nguồn                                                                                                                                                   | Loại                                  | Tin cậy                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------- |
-| Trang diagrams TI — lượt đo 2026-09-21, commit `a31c47f` (`d1tibdarzmw3jq.cloudfront.net/diagrams`)                                                     | Hiện trạng đo live                    | Cao — `OBSERVED`          |
-| `Testing Intelligence Architecture Overview and Integration with Xora Platform.md`                                                                      | Thiết kế nội bộ (laws, §19, §23, §28) | Cao                       |
-| `TI-Infrastructure-Research-Plan.md` §2–§3.1                                                                                                            | Taxonomy + bản đồ AWS-first           | Cao                       |
+| Nguồn                                                                                                                                                                               | Loại                                  | Tin cậy                   |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------- |
+| Trang diagrams TI — lượt đo 2026-09-21, commit `a31c47f` (`d1tibdarzmw3jq.cloudfront.net/diagrams`)                                                                                 | Hiện trạng đo live                    | Cao — `OBSERVED`          |
+| `Testing Intelligence Architecture Overview and Integration with Xora Platform.md`                                                                                                  | Thiết kế nội bộ (laws, §19, §23, §28) | Cao                       |
+| `TI-Infrastructure-Research-Plan.md` §2–§3.1                                                                                                                                        | Taxonomy + bản đồ AWS-first           | Cao                       |
 | AWS docs: ECS/Fargate, EKS/Karpenter, Bedrock AgentCore, Distributed Load Testing on AWS, Device Farm, Inspector, Network Firewall, RDS, S3 Object Lock | Vendor docs chính thức                | Cao                       |
-| Giá Fargate công bố                                                                                                                                     | Vendor pricing                        | Cao — re-verify khi spike |
+| Giá Fargate công bố                                                                                                                                                                 | Vendor pricing                        | Cao — re-verify khi spike |
 
 > **Nguyên tắc đã tuân thủ:** mọi nhận định gắn nhãn OBSERVED/INFERRED/CANDIDATE; không con số nào từ marketing; mọi quyết định kèm exit note (law 23); falsifiability ghi ở §6.2; không claim vượt gate §28.
