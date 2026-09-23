@@ -431,6 +431,3 @@ flowchart TD
 | **4. Kiểm thử Cơ sở dữ liệu** | **Aurora Serverless v2 Clone + Fargate** | S07 | Log thực thi migration, bảng diff dữ liệu trước/sau test | Clone: **\$0**; ACU: **~\$0.12/giờ** (chạy vài phút rồi xóa: **< \$0.02**) | Nhân bản DB Staging trong < 60s để test an toàn tuyệt đối trước khi merge. |
 | **5. Kiểm thử Hiệu năng** | **AWS Distributed Load Testing + k6** | S07 & CI nội bộ | File JSON phân vị độ trễ (p95/p99), biểu đồ Throughput RPS | Fargate: **~\$0.05 - \$0.15 cho mỗi đợt test tải 5 phút** | Phát hiện suy thoái hiệu năng và kiểm tra sức chịu tải của chính TI API (:8000). |
 | **6. Đánh giá Mô hình AI** | **Amazon Bedrock Evaluations** | S05/S06 | Điểm số `GroundednessScore`, `AccuracyScore` (0.0 - 1.0) | Token Bedrock: **vài cent / lượt kiểm định** | Đảm bảo AI Claude không bị ảo giác và sinh test case có căn cứ thực tế. |
-
----
-*Tài liệu đã được cập nhật tinh gọn: loại bỏ hoàn toàn Contract Testing, Visual Regression Testing, Mobile Testing và Lưu trữ hạ tầng ra khỏi giải pháp TI; đồng thời giữ nguyên bảng so sánh theo định dạng hàng ngang (tiêu chí) - hàng dọc (dịch vụ) có cột chi phí.*
