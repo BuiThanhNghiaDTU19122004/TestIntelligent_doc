@@ -16,6 +16,52 @@
 
 ---
 
+## MỤC LỤC
+
+1. [PHẦN 1: BỐI CẢNH KIẾN TRÚC & HIỆN TRẠNG KỸ THUẬT CẦN TUÂN THỦ](#1-bối-cảnh-kiến-trúc--hiện-trạng-kỹ-thuật-cần-tuân-thủ)
+   - [1.1. Hiện trạng Thực tế Hệ thống (TIEF Phase 1 & Baseline Documents)](#11-hiện-trạng-thực-tế-hệ-thống-tief-phase-1--baseline-documents)
+   - [1.2. Các Ràng buộc Kiến trúc Bất biến (Non-Negotiable Invariants)](#12-các-ràng-buộc-kiến-trúc-bất-biến-non-negotiable-invariants)
+2. [PHẦN 2: HỆ MODEL CLAUDE HIỆN HÀNH TRÊN AWS BEDROCK (CẬP NHẬT 22/09/2026)](#2-hệ-model-claude-hiện-hành-trên-aws-bedrock-cập-nhật-22092026)
+   - [2.1. Biểu Phí & Thông Số Kỹ Thuật Chính Thức](#21-biểu-phí--thông-số-kỹ-thuật-chính-thức)
+   - [2.2. Đánh giá Năng lực Thực thi (Benchmarks) & Bài học Thực địa](#22-đánh-giá-năng-lực-thực-thi-benchmarks--bài-học-thực-địa)
+3. [PHẦN 3: NGHIÊN CỨU CHUYÊN SÂU THEO 5 DOMAIN TESTING](#3-nghiên-cứu-chuyên-sâu-theo-5-domain-testing)
+   - [Mục 3.1. Domain 1: API Testing](#mục-31-domain-1-api-testing)
+     - *1. Cấu trúc Test Candidate Executable Schema (`API_CANDIDATE_V1`)*
+     - *2. Bổ sung Prompt / Instruction cho S05 & S06*
+     - *3. Đánh giá Model Reasoning, Token/Cost/Latency & Khuyến nghị Phân tầng*
+     - *4. Thiết kế ToolIntent cho API Adapter*
+     - *5. Phân tích Artifact Đầu Vào & Cơ chế Cô lập Prompt Injection*
+   - [Mục 3.2. Domain 2: Database Testing (DB)](#mục-32-domain-2-database-testing-db)
+     - *1. Cấu trúc Test Candidate Executable Schema (`DATABASE_CANDIDATE_V1`)*
+     - *2. Bổ sung Prompt / Instruction cho S05 & S06*
+     - *3. Đánh giá Model Reasoning, Token/Cost/Latency & Khuyến nghị Phân tầng*
+     - *4. Thiết kế ToolIntent cho Database Adapter*
+     - *5. Phân tích Artifact Đầu Vào & Cơ chế Cô lập Prompt Injection*
+   - [Mục 3.3. Domain 3: UI Testing](#mục-33-domain-3-ui-testing)
+     - *1. Cấu trúc Test Candidate Executable Schema (`UI_CANDIDATE_V1`)*
+     - *2. Bổ sung Prompt / Instruction cho S05 & S06*
+     - *3. Đánh giá Model Reasoning, Token/Cost/Latency & Khuyến nghị Phân tầng*
+     - *4. Thiết kế ToolIntent cho UI Adapter*
+     - *5. Phân tích Artifact Đầu Vào & Cơ chế Cô lập Prompt Injection*
+   - [Mục 3.4. Domain 4: Performance Testing](#mục-34-domain-4-performance-testing)
+     - *1. Cấu trúc Test Candidate Executable Schema (`PERFORMANCE_CANDIDATE_V1`)*
+     - *2. Bổ sung Prompt / Instruction cho S05 & S06*
+     - *3. Đánh giá Model Reasoning, Token/Cost/Latency & Khuyến nghị Phân tầng*
+     - *4. Thiết kế ToolIntent cho Performance Adapter*
+     - *5. Phân tích Artifact Đầu Vào & Cơ chế Cô lập Prompt Injection*
+   - [Mục 3.5. Domain 5: Security Testing](#mục-35-domain-5-security-testing)
+     - *1. Cấu trúc Test Candidate Executable Schema (`SECURITY_CANDIDATE_V1`)*
+     - *2. Bổ sung Prompt / Instruction cho S05 & S06*
+     - *3. Đánh giá Model Reasoning, Token/Cost/Latency & Khuyến nghị Phân tầng*
+     - *4. Thiết kế ToolIntent cho Security Adapter*
+     - *5. Phân tích Artifact Đầu Vào & Cơ chế Cô lập Prompt Injection (Trọng tâm An ninh)*
+4. [PHẦN 4: MA TRẬN ĐÁNH GIÁ & SO SÁNH TỔNG HỢP (CROSS-DOMAIN COMPARATIVE MATRIX)](#4-ma-trận-đánh-giá--so-sánh-tổng-hợp-cross-domain-comparative-matrix)
+5. [PHẦN 5: THIẾT KẾ MỞ RỘNG CAPABILITY MANIFESTS](#5-thiết-kế-mở-rộng-capability-manifests)
+6. [PHẦN 6: KẾT LUẬN & KẾ HOẠCH THỰC ĐỊA (GROUND TRUTH LOOP)](#6-kết-luận--kế-hoạch-thực-địa-ground-truth-loop)
+7. [PHỤ LỤC: DANH MỤC ĐỀ XUẤT CÔNG CỤ & ADAPTERS CHO CẢ 5 DOMAIN](#phụ-lục-danh-mục-đề-xuất-công-cụ--adapters-cho-cả-5-domain)
+
+---
+
 ## 1. Bối cảnh Kiến trúc & Hiện trạng Kỹ thuật Cần Tuân thủ
 
 ### 1.1. Hiện trạng Thực tế Hệ thống (TIEF Phase 1 & Baseline Documents)
