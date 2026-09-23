@@ -171,42 +171,67 @@ Budget spike ước tính < $200 (tài nguyên theo giây, synthetic artifact). 
 
 ---
 
-# 8. Phương án đề xuất — kiến trúc tổng thể
+# 8. Phương án đề xuất — kiến trúc tổng thể (v0.2-aligned)
+
+> 🎨 **Diagram chi tiết chuẩn draw.io:** Xem file source [Task2_AWS_Architecture_Execution_Pipeline.drawio](file:///D:/Doc/Task2_AWS_Architecture_Execution_Pipeline.drawio) hoặc mở bản tương tác trực quan tại [Task2_AWS_Architecture_Diagram.html](file:///D:/Doc/Task2_AWS_Architecture_Diagram.html).
 
 ```mermaid
 flowchart TB
-    subgraph A["Account A - Backend ap-southeast-1 - hien trang OBSERVED"]
-        CF["CloudFront"] --> API["TI API v2"]
-        API --> PRT["Portal"]
-        API --> JC["Job Controller / Worker: lease, heartbeat, recovery"]
-        JC --> DB[("PostgreSQL - Job Store: nang tu SQLite DEV theo muc 23")]
-        JC --> OBJ[("S3 + Object Lock: evidence + digest")]
+    subgraph A["Account A - Backend ap-southeast-1 - Control Plane & Persistence"]
+        CF["CloudFront + WAF"] --> API["TI API v2 (FastAPI on ECS)"]
+        API --> JC["Job Controller / Worker: Lease, Heartbeat, Recovery, TenantBinding"]
+        JC --> DB[("Amazon RDS PostgreSQL\n(Job Store, Run Metadata, Bindings)")]
+        JC --> SEC["AWS Secrets Manager\n(Tenant API keys, Short-lived STS)"]
+        JC --> S3[("Amazon S3 + Object Lock\n(Evidence Store, SHA-256 WORM)")]
     end
 
-    subgraph B["Account B - AgentCore us-east-1 - hien trang OBSERVED"]
-        HAR["Harness"] --> MDL["Bedrock Models"]
-        HAR --> POL["Policy - PHAI ENFORCE"]
-        HAR --> MEM["Memory - chi knowledge da duyet"]
+    subgraph B["Account B - AgentCore us-east-1 - AI Reasoning Plane"]
+        HAR["AgentCore Harness / Runtime\n(S01 Context -> S02 Change -> S03 Impact -> S04 Risk)"]
+        MDL["Bedrock Models (Haiku 4.5 / Sonnet 5 / Opus 5)\n+ Bedrock Guardrails"]
+        MEM[("Approved Memory & Knowledge Base\n(Golden Samples, Vetted Policies)")]
+        HAR --> MDL
+        HAR --> MEM
     end
 
-    subgraph NEW["Mien mo rong - de xuat Task 2 - CANDIDATE"]
-        SBX["D2 Sandbox: ECS Fargate task-per-job, interface IsolatedRunner - law 23"]
-        BRF["D3 Browser: Playwright tren Fargate"]
-        LOD["D4 Load: DLT on AWS - k6"]
-        SCN["D5 Security: ZAP hoac nuclei container"]
-        EGR["D9 Egress: no-internet mac dinh, scoped theo binding"]
+    subgraph NEW["Task 2 - Isolated Sandbox VPC ap-southeast-1 (No-Internet Default - D9)"]
+        VPCE["AWS PrivateLink VPC Endpoints\n(ECR, S3, CloudWatch Logs, Secrets Mgr)"]
+        
+        subgraph RUNNERS["ECS Fargate Task-per-Job (Interface IsolatedRunner - Law 23)"]
+            R1["Runner 1: Unit & API (L1, L2)\nSchemathesis + Playwright API"]
+            R2["Runner 2: UI Browser Farm (L3, L8, D3)\nPlaywright Headless + axe-core"]
+            R3["Runner 3: Performance & Load (L5, D4)\nDLT on AWS + k6 Runner"]
+            R4["Runner 4: Security Scanner (L6, D5)\nW1: Semgrep OSS + Trivy + Gitleaks\nW3: OWASP ZAP / nuclei DAST"]
+            R5["Runner 5: Database Runner (D2.b)\nFlyway Migration + SQLAlchemy Read-Only"]
+        end
+
+        AURORA[("Amazon Aurora Serverless v2 Clone (D2.b)\nTạo bản sao DB < 60s, auto-destroy")]
+        SCOPED["Scoped Egress (VPC Peering / PrivateLink)\nChỉ mở tới Tenant Staging theo Binding"]
+        HASH["Evidence Normalizer & SHA-256 Hasher (Law 16)"]
     end
 
-    JC -->|"invoke"| HAR
-    JC -->|"dispatch co lease"| SBX
-    SBX --> BRF
-    SBX --> LOD
-    SBX --> SCN
-    SBX --- EGR
-    SBX -->|"raw result, normalize + hash - law 16"| OBJ
+    subgraph GOV["Chặng Tổng hợp & Quản trị: S08 -> S09 -> S10"]
+        S08["S08: Qualification Gate (Deterministic Barrier)"]
+        S09["S09: AI Recommendation (Khuyến nghị ≠ Phê duyệt)"]
+        S10["S10: Human Sign-off & Knowledge Feedback"]
+        S08 --> S09 --> S10
+    end
+
+    %% Flow Handshake & Dispatch
+    JC -->|"① Dispatch Reasoning (Artifact + Context)"| HAR
+    HAR -->|"② ToolIntent JSON (Candidate chưa chạy)"| JC
+    JC -->|"③ Tra cứu TenantBinding & Dispatch Task-per-job"| RUNNERS
+    
+    RUNNERS -.->|"Kéo image & config an toàn"| VPCE
+    R5 -->|"Migration test"| AURORA
+    R2 & R4 -.->|"E2E / DAST (Scoped)"| SCOPED
+    
+    RUNNERS -->|"Logs, JUnit, Traces, SARIF"| HASH
+    HASH -->|"④ Immutable SHA-256 Write"| S3
+    HASH -->|"⑤ Cập nhật Job State & Digest"| JC
+    JC -->|"⑥ Trigger Gate & Synthesis"| S08
+    S10 -.->|"Approved rules"| MEM
+    S10 -->|"⑦ Trả kết quả / Runs Webhook"| CF
 ```
-
-> Nếu vẫn không hiển thị: cần viewer hỗ trợ Mermaid — VS Code cài extension **"Markdown Preview Mermaid Support"** rồi mở preview (Ctrl+Shift+V); Confluence dùng macro **Mermaid**; hoặc paste code trên vào https://mermaid.live để xem/xuất PNG chèn vào slide.
 
 **Nguyên tắc mở rộng (ăn vào mục tiêu Task 2):** mỗi loại test mới = một **Evaluation Pack** (image + oracle + evidence schema) gắn qua provider port — *không đục lõi*. Chỉ đầu tư cơ chế mở rộng khi có ≥2 pack thật (YAGNI có kiểm soát).
 
