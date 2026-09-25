@@ -122,28 +122,61 @@ Dữ liệu benchmark công bố chính thức và xác nhận độc lập:
 
 ## 3. Nghiên cứu Chuyên sâu Theo 5 Domain Testing
 
+> [!TIP]
+> **SƠ ĐỒ WORKFLOW & ĐIỀU PHỐI CÔNG CỤ HOÀN CHỈNH (TASK 3 & TASK 4)**:
+> Bản vẽ kiến trúc chi tiết đã được xuất bản dưới định dạng Draw.io chuẩn: [task3_workflow_diagram.drawio](file:///D:/Doc/task3_workflow_diagram.drawio) và trình xem tương tác trực quan [Task3_AI_Workflow_Orchestration_Diagram.html](file:///D:/Doc/Task3_AI_Workflow_Orchestration_Diagram.html).
+> Sơ đồ thể hiện luồng giao tiếp giữa 3 tầng AI Model (Opus 5 / Sonnet 5 / Haiku 4.5), cơ chế Handshake điều phối công cụ Server-Owned tại S07, và khung đánh giá 3 tầng ISTQB (CTFL · CT-AI · CT-GenAI) từ Task 4.
+
 ```mermaid
 flowchart TD
-  subgraph S01_S06 ["1. TI Reasoning Loop (Harness / Bedrock)"]
-    S01["S01 Target Registry"] --> S02["S02 Change Detector"]
-    S02 --> S03["S03 Impact Engine"]
-    S03 --> S04["S04 Risk Engine"]
-    S04 --> S05["S05 Test Planning\n(Model: Sonnet 5 / Opus 5)"]
-    S05 --> S06["S06 Candidate Generation\n(Model: Haiku 4.5 / Sonnet 5)"]
-    S06 --> TC["Test Candidates\n(truth_class = CANDIDATE)"]
+  subgraph S01_S02 ["1. Ingress & Context Isolation (4-Barrier Defense)"]
+    ING["CI/CD PR Diff, OpenAPI, SQL, DOM"] --> S01["S01 Target Registry"]
+    S01 --> S02["S02 Change Detector (Atomic Deltas)"]
+    S02 --> ISO["🛡️ 4-Barrier Prompt Injection Isolation\n(Strip text descriptions, SQL comments, hidden DOM)"]
+    ISO --> CTX["Sanitized PinnedContext + SHA-256 Digest"]
   end
 
-  subgraph S07_Orchestration ["2. Server-Controlled Gateway & Execution"]
-    TC --> S07["S07 Orchestration Engine"]
-    S07 -->|Validate Intent & Allowlist| GTW["AgentCore Gateway & Worker"]
-    GTW -->|Inject Secrets & Resolve Binding| EXEC["Domain Deterministic Tools\n(Hurl, Testcontainers, Playwright, k6, Semgrep)"]
+  subgraph S03_S06 ["2. AI Multi-Model Reasoning & Tiering (Bedrock us-east-1)"]
+    CTX --> S03["S03 Impact Engine (Call Graph & Blast Radius)"]
+    S03 --> S04{"S04 Risk Engine\nRisk == CRITICAL?"}
+    S04 -->|YES: Threat Modeling| OPUS["Claude Opus 5 (Deep Reasoning)\n$5/$25 · GPQA 93.2% · SWE 96%"]
+    S04 -->|NO: Default Plan| SONNET["Claude Sonnet 5 (Workhorse)\n$2/$10 · Terminal-Bench 80.4%"]
+    OPUS --> SONNET
+    SONNET --> S05["S05 Test Planning (4-Tier Plan)"]
+    S05 --> HAIKU["Claude Haiku 4.5 (Cost-Optimized)\n$1/$5 · Latency < 2s · Mẫu hóa boundary/null"]
+    S05 -->|Chained Complex Flows| SONNET_GEN["Claude Sonnet 5 (Complex Journeys)"]
+    HAIKU --> TC["Validated Test Candidate Schemas\n(API, DB, UI, Perf, Security) · Truth: CANDIDATE"]
+    SONNET_GEN --> TC
+    TC --> INTENT["ToolIntent Compiler (ToolIntent JSON)\n(logical_tool_id, operation, args, execution_mode)"]
   end
 
-  subgraph S08_S09 ["3. Evidence & Deterministic Gate"]
-    EXEC -->|Raw Outputs| S08["S08 Evidence Store\n(Normalize -> Hash -> OBSERVED)"]
-    S08 --> S09["S09 Gate Recommendation\n(Deterministic Rules + Model Rationale)"]
+  subgraph S07_Execution ["3. S07 Server-Owned Orchestration & Handshake (ap-southeast-1)"]
+    INTENT -->|SigV4 Cross-Account| GTW["Cross-Account IAM & Gateway Bridge"]
+    GTW --> JC["⚙️ Job Controller & Worker Pool\n(Server Allowlist Check · Law 15)"]
+    JC <-> SEC["AWS Secrets Manager\n(TenantBinding & Credential Injection · Laws 12-14)"]
+    JC --> GRD["Server Guardrails: Perf MAX_VUS=100 · DB Rollback · Net None"]
+    GRD --> RUNNERS["Isolated Multi-Domain Runners (5 Domains)"]
+    RUNNERS --> D1["D1 API: Mode 1 Schemathesis + Mode 2 Playwright API"]
+    RUNNERS --> D2["D2 DB: Aurora Serverless v2 Clone + Flyway & SQLAlchemy"]
+    RUNNERS --> D3["D3 UI: CloudWatch Synthetics + Playwright + axe-core"]
+    RUNNERS --> D4["D4 Perf: AWS DLT + k6 Engine (SLO Thresholds)"]
+    RUNNERS --> D5["D5 Sec: Semgrep + Trivy + Gitleaks (W1) + CodeGuru"]
   end
-```
+
+  subgraph S08_S09 ["4. Evidence Store & S09 Gate Recommendation (ISTQB Evaluation)"]
+    D1 & D2 & D3 & D4 & D5 --> S08["S08 Evidence Normalizer\n(Raw Logs -> Normalize -> SHA-256 Digest)"]
+    S08 --> S3["Amazon S3 Object Lock (WORM Compliance)\nTruth Class = OBSERVED (Law 16)"]
+    S3 --> S09["S09 Deterministic Quality Gate Barrier (Laws 5, 7, 18)\n(CRITICAL > 0 -> DO_NOT_PASS | HIGH > 0 -> HOLD)"]
+    S09 --> GENAI["6 GenAI Evaluation Metrics (ISTQB CT-GenAI §5)\nGroundedness >= 0.80 · GoalSuccess >= 0.75 · Recall >= 0.95 · Hallucination <= 2%"]
+    GENAI --> SYN["AI Rationale Synthesizer (Sonnet 5 / Haiku 4.5)\n(Audit-ready Gate Recommendation Report)"]
+  end
+
+  subgraph S10_Loop ["5. Learning & Ground Truth Benchmark Loop"]
+    SYN --> S10["S10 Production Learning (REUSE_RECEIPT)\n(Prevents Pesticide Paradox - CTFL Principle 5)"]
+    S10 --> GT["🔄 Ground Truth Benchmark Loop (Internal Gold Standard Repos)\n(Calibrates Model Tiering & Token Admission)"]
+    GT --> HUMAN["Human Reviewer Authority (Law 9)\n(Web Portal :8001 Sign-off & Waivers)"]
+    GT -.->|Feedback Delta & Model Calibration| S01
+  end
 
 ---
 
@@ -993,15 +1026,15 @@ timeout_seconds: 300
 
 | Domain | Ứng viên Công cụ / Thư viện | Loại hình | Cơ chế Tích hợp vào TI Worker / Gateway | Bằng chứng Thu thập (S08 Evidence) |
 | :--- | :--- | :--- | :--- | :--- |
-| **API** | **Hurl** *(Rust-based)* | Binary CLI | Đóng gói vào Worker container; thực thi qua execution grant; native JSONPath/regex assertions và capture headers/mTLS. | HTTP status, headers, SHA-256 body hash, latency ms. |
-| **API** | **httpx + pydantic** | Python Library | Nhúng trực tiếp vào tiến trình TI Job Worker; kiểm soát timeout ms và mTLS. | Kết quả validate schema, status, response hash. |
-| **Database** | **Testcontainers** *(Python/Go)* | Container Sandbox | Worker gọi Docker socket nội bộ dựng ephemeral container DB (Postgres/MySQL) sạch cho từng job; chạy test xong tự hủy. | Log migration, schema checksum sau khi chạy, query plan digest. |
-| **Database** | **SQLAlchemy + asyncpg** | Python Library | Module thực thi query trong worker với transaction mode `READ ONLY` và `ROLLBACK` bắt buộc. | Row count, column metadata, hash tập kết quả (result set hash). |
-| **UI** | **ti-playwright Container** | Container Service | Nâng cấp từ MCP hiện tại thành Playwright Worker độc lập trong VPC nội bộ; hỗ trợ full-page screenshot và trace.zip. | PNG Screenshot (S3 URI + SHA-256), Playwright trace file, console errors. |
-| **UI** | **Axe-core Playwright** | Node/Python Lib | Tích hợp vào Playwright runner script để kiểm tra tự động các vi phạm WCAG 2.1 A/AA/AAA. | Danh sách vi phạm accessibility (JSON format). |
-| **UI** | **Pixelmatch / Resemble.js** | Node/Python Lib | So khớp từng pixel giữa ảnh chụp thực tế và Golden Baseline Image để ra tỷ lệ phần trăm sai lệch khách quan. | Tỷ lệ mismatch percentage và visual diff image hash. |
-| **Performance**| **k6 (Grafana)** | Go Binary CLI | Đóng gói thành container `ti-k6-runner`; chạy kịch bản stages và tự động đối chiếu native Thresholds (P95/P99). | `summary.json`, latency percentiles, error rate, RPS. |
-| **Performance**| **Prometheus / CloudWatch Exporter** | API Collector | Adapter truy vấn telemetry của target service trong suốt thời gian chạy tải để đo tương quan tiêu thụ CPU/RAM. | Snapshot biểu đồ sử dụng tài nguyên hạ tầng. |
-| **Security** | **Semgrep OSS** | SAST CLI | Đóng gói thành container `ti-security-semgrep`; chạy quét tĩnh với ruleset YAML offline; xuất chuẩn SARIF. | File `results.sarif`, SHA-256 digest, danh sách CWE. |
-| **Security** | **Trivy (Aqua Security)**| SCA / CVE CLI | Quét dependencies lockfiles, base images và phát hiện CVE đã biết; xuất chuẩn SARIF/JSON. | Danh sách CVE IDs, CVSS scores, package version. |
-| **Security** | **Gitleaks** | Secret CLI | Quét tìm API keys, credentials bị hardcode trong Git diff trước khi nạp artifact vào pipeline. | Danh sách phát hiện secret lộ lọt (file, line, type). |
+| **API** | **Schemathesis** *(Mode 1 - Fuzzing)* | CLI / Lambda | Tự động sinh hàng nghìn ca kiểm thử biên từ OpenAPI spec trên AWS CodeBuild/Lambda (tiết kiệm token AI). | Log fuzzing, error responses, schema conformance. |
+| **API** | **Playwright API / httpx** *(Mode 2 - Flow)* | Library / Fargate | Thực thi kịch bản chuỗi nghiệp vụ phức tạp từ `API_CANDIDATE_V1` do Claude Sonnet 5 sinh ra. | HTTP status, headers, SHA-256 body hash, latency ms. |
+| **Database** | **Aurora Serverless v2 Clone + Flyway** | AWS Service / ECS | Khởi tạo bản clone DB cô lập từ snapshot tenant trong < 60s; Fargate chạy Flyway thử nghiệm migration; tự hủy sau khi test. | Log migration, schema checksum sau khi chạy, execution plan. |
+| **Database** | **SQLAlchemy (Read-Only Mode)** | Python Library | Thực thi parameterized queries kiểm tra `information_schema` với transaction mode `READ ONLY` và `ROLLBACK` bắt buộc. | Row count, column metadata, hash tập kết quả (result set hash). |
+| **UI** | **CloudWatch Synthetics + Playwright** | Serverless / Fargate | Canaries Playwright thực thi flow người dùng theo `UI_CANDIDATE_V1`, inject cookie phiên thật qua TenantBinding. | PNG Screenshot (S3 URI + SHA-256), Playwright trace file, console errors. |
+| **UI** | **axe-core Playwright** | Node/Python Lib | Tích hợp vào Playwright runner script để kiểm tra tự động các vi phạm khả năng tiếp cận WCAG 2.1 A/AA. | Danh sách vi phạm accessibility (JSON format). |
+| **Performance**| **k6 (Grafana) + AWS DLT** | Go CLI / Fargate | AWS Distributed Load Testing điều phối k6 runner; đối chiếu với ngưỡng SLO từ Evaluation Pack. | `summary.json`, latency percentiles (P95/P99), error rate, RPS. |
+| **Performance**| **CloudWatch Metrics Exporter** | AWS Native | Thu thập telemetry tài nguyên CPU, RAM, IOPS của target service trong suốt quá trình bơm tải. | Biểu đồ tương quan tải và mức tiêu hao tài nguyên. |
+| **Security** | **Semgrep OSS (Wave 1)** | SAST CLI (Offline) | Đóng gói vào Fargate container `--network none`; quét tĩnh mã nguồn theo ruleset OWASP Top 10; xuất chuẩn SARIF. | File `results.sarif`, SHA-256 digest, danh sách CWE IDs. |
+| **Security** | **Trivy + Gitleaks (Wave 1)** | SCA & Secret CLI | Quét dependencies lockfiles tìm CVE và quét phát hiện secret/API key rò rỉ trong git diff. | Danh sách CVE IDs, CVSS scores, secrets leaked count. |
+| **Security** | **Amazon CodeGuru Security + Inspector** | AWS Native ML | Phân tích diff bằng mô hình học máy của AWS; kết hợp Inspector quét lỗ hổng runtime và package. | JSON findings, Risk Score, CVSS vulnerability list. |
+| **Security** | **OWASP ZAP / nuclei (Wave 3)** | DAST Runner | Chỉ kích hoạt khi tenant có Staging URL sống để quét lỗ hổng động (Dynamic Application Security Testing). | DAST scan report, alert levels, evidence payloads. |
