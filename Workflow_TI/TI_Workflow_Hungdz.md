@@ -13,7 +13,7 @@ Mục đích của sơ đồ này là để chúng ta thấy rõ: AI đóng vai 
 
 ## 2. SƠ ĐỒ WORKFLOW TỔNG THỂ
 
-[Xem Sơ đồ Workflow (PDF)](workflow_Hung.pdf)
+[Xem Sơ đồ Workflow (PDF)](Workflow_Hung.pdf)
 
 ---
 
