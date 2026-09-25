@@ -1,100 +1,19 @@
-# TÀI LIỆU ĐẶC TẢ SƠ ĐỒ LUỒNG THỰC THI (WORKFLOW) TESTING INTELLIGENCE (TI)
-**Chịu trách nhiệm:** QA Strategy & Architecture Team
-**Mục tiêu:** Cung cấp tài liệu tham chiếu chi tiết giúp toàn bộ các nhóm (DevOps, Architecture, AI, Tooling) hiểu rõ vòng đời của một tác vụ kiểm thử (Job) trong hệ thống TI, từ lúc hệ thống tiếp nhận yêu cầu đến khi ra quyết định phát hành cuối cùng.
+# TÀI LIỆU : SƠ ĐỒ LUỒNG THỰC THI (WORKFLOW) TESTING INTELLIGENCE (TI)
+**Người trình bày:** Hùng (QA Strategy)
+**Mục tiêu:** Giúp toàn bộ team (DevOps, Architecture, AI, Tooling) hiểu rõ bức tranh toàn cảnh về cách một tác vụ kiểm thử chạy thực tế trong hệ thống TI, từ lúc tiếp nhận đến khi ra quyết định cuối cùng.
 
 ---
 
-## 1. TỔNG QUAN LUỒNG THỰC THI
-Bản vẽ Workflow này được đúc kết từ **Master Architecture Blueprint** mới nhất, thể hiện sự đồng bộ kiến trúc giữa các mảng: Hạ tầng, AI và Tooling. 
+## 1. TỔNG QUAN
+Bản vẽ được đúc kết từ **Master Architecture Blueprint** mới nhất, tổng hợp bài làm của tất cả các mảng: Hạ tầng (Hoàng), AI (Nghĩa) và Tooling (Trang). 
 
-Tài liệu này đặc tả rõ sự phân tách trách nhiệm giữa các thành phần cốt lõi: vai trò suy luận của AI (Reasoning), quyền điều phối của Job Controller (Execution Authority), và cơ chế lưu trữ bằng chứng để đảm bảo tính minh bạch, bảo mật tuyệt đối của hệ thống.
+Mục đích của sơ đồ này là để chúng ta thấy rõ: AI đóng vai trò gì, Job Controller điều phối ra sao, và kết quả được lưu trữ như thế nào để đảm bảo tính minh bạch, bảo mật tuyệt đối.
 
 ---
 
-## 2. SƠ ĐỒ WORKFLOW TỔNG THỂ (MERMAID)
+## 2. SƠ ĐỒ WORKFLOW TỔNG THỂ
 
-*(Tài liệu có thể được tham chiếu cùng với sơ đồ gốc định dạng PDF `workflow.TI.pdf`)*
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Dev as Developer<br/>(CI/CD)
-    participant API as TI API v2 / Core<br/>(Account A)
-    participant Sec as Security<br/>(CodeGuru/Semgrep)
-    participant AI as Bedrock Model Tiering<br/>(Account B)
-    participant JC as Job Controller<br/>(Workflow Authority)
-    participant DB as Job Store<br/>(RDS PostgreSQL)
-    participant Run as Fargate Sandbox<br/>(IsolatedRunner)
-    participant S3 as S3 Object Lock<br/>(Evidence)
-    actor QA as QA Lead<br/>/ Authority
-
-    Dev->>API: POST /v2/artifact-jobs (Artifact + sha256)
-    API->>JC: Enqueue Job Request
-    JC->>DB: Ghi trạng thái QUEUED
-    API-->>Dev: 202 Accepted {job_id, poll_url}
-    
-    rect rgb(242, 242, 242)
-    note right of API: [DETERMINISTIC] Tiếp nhận & Phân tích ban đầu (S01-S02)
-    API->>API: S01: Target Registry (Ghim Context)
-    API->>API: S02: Change Detector (Bóc tách diff)
-    API->>Sec: Quét SAST / CVE (Semgrep + Trivy)
-    Sec-->>API: JSON Danh sách lỗ hổng
-    end
-
-    rect rgb(255, 243, 230)
-    note right of AI: [HYBRID] Phân tích Rủi ro & Tác động (S03-S04)
-    JC->>AI: InvokeHarness (Gửi Task Context, Law 10.1)
-    AI->>AI: S03: Impact Engine (AI đánh giá phụ thuộc)
-    AI->>AI: S04: Risk Engine (AI xác định Risk Tier)
-    end
-
-    rect rgb(245, 240, 255)
-    note right of AI: [MODEL] AI Reasoning: Lập Kế hoạch & Sinh Test (S05-S06)
-    opt Khi Risk Tier == CRITICAL
-        AI->>AI: Claude Opus 5 (Phân tích Threat Modeling)
-    end
-    AI->>AI: S05/S06: Claude Sonnet 5 (Lập kế hoạch & Sinh Test)
-    AI->>AI: Bedrock Eval kiểm định Groundedness & Faithfulness
-    AI-->>JC: Trả về ToolIntent JSON (Không chứa Secret/URL thật)
-    end
-
-    rect rgb(235, 245, 255)
-    note right of JC: [SERVER-OWNED]<br/>Điều phối & Thực thi (S07)
-    JC->>JC: Admission (Validate Schema, Allowlist, Quota)
-    JC->>JC: TenantBinding Resolver & Gọi AWS STS cấp Token tạm
-    JC->>DB: Cập nhật Step State: RUNNING (Lease TTL 5 mins)
-    
-    par Direct Dispatch Ngang hàng (ECS RunTask)
-        JC->>Run: Invoke D5a (SAST) / D3 (UI) / D4 (Perf)<br/>/ D2.b (DB Clone) / D5b (DAST)
-    end
-    
-    loop Heartbeat
-        Run-->>JC: Gửi Heartbeat gia hạn lease
-    end
-    Run->>Run: Thực thi code trong Sandbox (Mạng NO-INTERNET)
-    end
-
-    rect rgb(235, 250, 240)
-    note right of S3: [DETERMINISTIC / HUMAN] Bằng chứng & Phán quyết (S08-S10)
-    Run->>S3: Ghi Raw Result (Logs, Ảnh, HAR, Metrics)
-    Run-->>JC: Trả về kết quả hoàn tất + S3 Key
-    JC->>JC: Normalize + Băm SHA-256 Digest
-    JC->>S3: Khóa Object Lock (Luật 16 - Bất biến)
-    JC->>JC: Tính toán Gate Recommendation (S09 - Hybrid Gate)
-    JC->>DB: Cập nhật Job State: COMPLETED (Kèm Gate)
-    API->>API: S10: Production Learning (Lưu vào Memory - Human-Controlled)
-    end
-
-    loop Polling
-        Dev->>API: GET /v2/artifact-jobs/{job_id}
-        API-->>Dev: 200 OK {state: COMPLETED, gate: HOLD/PASS/DO_NOT_PASS}
-    end
-
-    opt Nếu Gate == HOLD (Cần phê duyệt từ người có thẩm quyền)
-        QA->>API: POST /v2/operations/{id}/actions<br/>(Submit Approved Waiver)
-        API->>DB: Cập nhật Final Release Decision: PASS
-    end
-```
+[Xem Sơ đồ Workflow (PDF)](workflow_Hung.pdf)
 
 ---
 
