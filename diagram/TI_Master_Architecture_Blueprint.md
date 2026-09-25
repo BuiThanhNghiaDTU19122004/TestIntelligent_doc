@@ -17,10 +17,10 @@
 ## MỤC LỤC
 
 1. [TỔNG QUAN CHIẾN LƯỢC & NGUYÊN TẮC HỢP NHẤT](#1-tổng-quan-chiến-lược--nguyên-tắc-hợp-nhất)
-2. [TAM HỢP KIẾN TRÚC: HỒN — XÁC — NÃO CỦA HỆ THỐNG TI](#2-tam-hợp-kiến-trúc-hồn--xác--não-của-hệ-thống-ti)
-   - [2.1. Phần Hồn: Triết lý Ports & Adapters và Interface IsolatedRunner (Law 23)](#21-phần-hồn-triết-lý-ports--adapters-và-interface-isolatedrunner-law-23)
-   - [2.2. Phần Xác: Hạ tầng AWS 2 Accounts, Fargate Sandbox & Tối ưu Mạng D9](#22-phần-xác-hạ-tầng-aws-2-accounts-fargate-sandbox--tối-ưu-mạng-d9)
-   - [2.3. Phần Não: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake](#23-phần-não-chuỗi-s01s10-bedrock-model-tiering--toolintent-handshake)
+2. [MÔ HÌNH HỢP NHẤT 3 TẦNG KIẾN TRÚC TI (3-TIER ARCHITECTURAL FRAMEWORK)](#2-mô-hình-hợp-nhất-3-tầng-kiến-trúc-ti-3-tier-architectural-framework)
+   - [2.1. Tầng Trừu Tượng Hóa & Nguyên Lý Kiến Trúc: Ports & Adapters và Interface IsolatedRunner (Law 23)](#21-tầng-trừu-tượng-hóa--nguyên-lý-kiến-trúc-ports--adapters-và-interface-isolatedrunner-law-23)
+   - [2.2. Tầng Hạ Tầng Điện Toán Đám Mây & An Ninh Mạng: AWS 2 Accounts, Fargate Sandbox & Tối ưu Mạng D9](#22-tầng-hạ-tầng-điện-toán-đám-mây--an-ninh-mạng-aws-2-accounts-fargate-sandbox--tối-ưu-mạng-d9)
+   - [2.3. Tầng Trí Tuệ Nhân Tạo & Điều Phối Đánh Giá Nghiệp Vụ: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake](#23-tầng-trí-tuệ-nhân-tạo--điều-phối-đánh-giá-nghiệp-vụ-chuỗi-s01s10-bedrock-model-tiering--toolintent-handshake)
 3. [SƠ ĐỒ KIẾN TRÚC TỔNG THỂ (C4 MODEL DIAGRAMS)](#3-sơ-đồ-kiến-trúc-tổng-thể-c4-model-diagrams)
    - [3.1. Sơ đồ C4 Level 2: Container & Deployment Topology (Toàn cảnh 3 vùng)](#31-sơ-đồ-c4-level-2-container--deployment-topology-toàn-cảnh-3-vùng)
    - [3.2. Sơ đồ C4 Level 3: Zoom sâu bên trong Job Controller (Workflow Authority)](#32-sơ-đồ-c4-level-3-zoom-sâu-bên-trong-job-controller-workflow-authority)
@@ -52,37 +52,37 @@ Hệ thống tuân thủ nghiêm ngặt **24 Architecture Laws** của TI, trong
 
 ---
 
-## 2. TAM HỢP KIẾN TRÚC: HỒN — XÁC — NÃO CỦA HỆ THỐNG TI
+## 2. MÔ HÌNH HỢP NHẤT 3 TẦNG KIẾN TRÚC TI (3-TIER ARCHITECTURAL FRAMEWORK)
 
-Bản thiết kế này dung hòa hoàn hảo đóng góp từ cả 4 nhóm chuyên trách:
+Bản thiết kế này chuẩn hóa và tích hợp toàn diện đóng góp từ cả 4 nhóm chuyên trách thành 3 phân tầng kiến trúc chính thức:
 
 ```
-                  ┌────────────────────────────────────────┐
-                  │          PHẦN NÃO (Task 3 & 4)         │
-                  │   Bedrock Claude Model Tiering 3 cấp   │
-                  │   Chuỗi S01-S10 & ToolIntent Handshake │
-                  │   ISTQB CT-AI / CT-GenAI Ground Truth  │
-                  └───────────────────┬────────────────────┘
-                                      │ (ToolIntent JSON - Law 10.1)
-                                      ▼
-┌─────────────────────────────────────┴─────────────────────────────────────┐
-│                            PHẦN HỒN (DevOps / Nguyên)                     │
-│               Triết lý Ports & Adapters (Hexagonal Architecture)           │
-│                    Cơ chế Plugin & Interface IsolatedRunner               │
-│                  Tách biệt Control Plane vs Execution Engine              │
-└─────────────────────────────────────┬─────────────────────────────────────┘
-                                      │ (Dispatch có Lease - Law 23)
-                                      ▼
-                  ┌────────────────────────────────────────┐
-                  │         PHẦN XÁC (Task 1 & 2)          │
-                  │      Hạ tầng AWS 2 Accounts Riêng Biệt │
-                  │    ECS Fargate Task-per-Job (Sandbox)  │
-                  │    Mạng D9 No-Internet & VPC Endpoints │
-                  │     Aurora Serverless v2 Clone (<60s)  │
-                  └────────────────────────────────────────┘
+                  ┌────────────────────────────────────────────────────────┐
+                  │  TẦNG TRÍ TUỆ NHÂN TẠO & ĐÁNH GIÁ NGHIỆP VỤ (Task 3&4) │
+                  │  • Bedrock Claude Model Tiering 3 cấp                  │
+                  │  • Chuỗi S01-S10 & ToolIntent Handshake (Law 10.1)     │
+                  │  • Khung đo lường chất lượng ISTQB CT-AI / CT-GenAI    │
+                  └───────────────────────────┬────────────────────────────┘
+                                              │ (ToolIntent JSON - Law 10.1)
+                                              ▼
+┌─────────────────────────────────────────────┴─────────────────────────────────────────────┐
+│                 TẦNG TRỪU TƯỢNG HÓA & NGUYÊN LÝ KIẾN TRÚC (DevOps / Nguyên)               │
+│                 • Triết lý Ports & Adapters (Hexagonal Architecture)                      │
+│                 • Cơ chế Plugin & Interface Chuẩn hóa IsolatedRunner (Law 23)             │
+│                 • Tách biệt Control Plane vs Execution Engine                             │
+└─────────────────────────────────────────────┬─────────────────────────────────────────────┘
+                                              │ (Dispatch có Lease - Law 23)
+                                              ▼
+                  ┌────────────────────────────────────────────────────────┐
+                  │   TẦNG HẠ TẦNG ĐIỆN TOÁN & AN NINH MẠNG (Task 1 & 2)   │
+                  │   • Hạ tầng AWS 2 Accounts Riêng Biệt                  │
+                  │   • ECS Fargate Task-per-Job (Sandbox Cô Lập VM)       │
+                  │   • Mạng D9 No-Internet & VPC Endpoints                │
+                  │   • Amazon Aurora Serverless v2 Clone (<60s)           │
+                  └────────────────────────────────────────────────────────┘
 ```
 
-### 2.1. Phần Hồn: Triết lý Ports & Adapters và Interface IsolatedRunner (Law 23)
+### 2.1. Tầng Trừu Tượng Hóa & Nguyên Lý Kiến Trúc: Ports & Adapters và Interface IsolatedRunner (Law 23)
 - **Đóng góp từ Hà Tây Nguyên (DevOps)**:
   - Áp dụng mẫu kiến trúc **Hexagonal (Ports and Adapters)** kết hợp **Plugin Architecture**.
   - **Tách bạch Control Plane và Execution Engine**: Control Plane (`Job Controller`) nắm giữ logic nghiệp vụ, quản lý vòng đời tác vụ, nhưng hoàn toàn mù (agnostic) đối với công nghệ kiểm thử cụ thể.
@@ -109,7 +109,7 @@ Bản thiết kế này dung hòa hoàn hảo đóng góp từ cả 4 nhóm chuy
     ```
   - **Lợi ích**: Khi cần thay thế Playwright bằng framework khác hoặc nâng cấp hạ tầng từ ECS Fargate sang EKS+Karpenter (khi throughput tăng cao), phần lõi Job Controller không bị thay đổi bất kỳ dòng code nào.
 
-### 2.2. Phần Xác: Hạ tầng AWS 2 Accounts, Fargate Sandbox & Tối ưu Mạng D9
+### 2.2. Tầng Hạ Tầng Điện Toán Đám Mây & An Ninh Mạng: AWS 2 Accounts, Fargate Sandbox & Tối ưu Mạng D9
 - **Đóng góp từ Hoàng (Task 2) & Trang (Task 1)**:
   - **Phân tách 2 AWS Accounts độc lập**:
     - **Account A (`ap-southeast-1` - Singapore)**: Backend TI, tiếp nhận API, quản trị danh tính và lưu trữ trạng thái có thẩm quyền.
@@ -120,7 +120,7 @@ Bản thiết kế này dung hòa hoàn hảo đóng góp từ cả 4 nhóm chuy
   - **Đột phá Tối ưu Chi phí Mạng D9 (Feedback v0.2)**:
     - Bỏ AWS Network Firewall (~$280/tháng/AZ) $\rightarrow$ Chuyển sang: **Private Subnet không route Internet + Security Group Deny All + VPC Endpoints (S3, ECR, CloudWatch Logs)**. Chi phí giảm từ ~$320/tháng xuống còn **~$22/tháng**.
 
-### 2.3. Phần Não: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake
+### 2.3. Tầng Trí Tuệ Nhân Tạo & Điều Phối Đánh Giá Nghiệp Vụ: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake
 - **Đóng góp từ Nghĩa (Task 3) & Hùng (Task 4)**:
   - **Xương sống 10 chặng xử lý (S01–S10)**: Phân định rõ ràng chặng nào dùng Mã cứng Deterministic (S01, S02, S08, S09 hard barrier), chặng nào dùng AI suy luận (S03 semantic, S04 threat modeling, S05 planning, S06 generation), và chặng nào do Tool đo lường (S07 execution).
   - **Chiến lược Model Tiering 3 cấp (Tiết kiệm 65–75% chi phí token)**:
