@@ -688,7 +688,7 @@ NGUYÊN TẮC 3 — TỪ CT-GENAI: "ĐÁNH GIÁ AI BẰNG SỐ — KHÔNG BẰNG
 | v1.2.0 | 22/09/2026 | Cập nhật theo feedback Nghĩa (5 items): (1) Sửa tác giả Task 2 = Hoàng (Architecture); (2) Bổ sung Dual-Mode API Testing (Schemathesis fuzzing + Playwright API/httpx cho API_CANDIDATE_V1); (3) Nâng cấp Security 4.2.5 thành Hybrid Defense 4-tầng (Tầng 0 AWS Native CodeGuru+Inspector → Tầng 1 Semgrep+Trivy+Gitleaks → Tầng 2 Opus 5 → Tầng 3 Manual Pentest); (4) Chuẩn hóa CRITICAL→DO_NOT_PASS (hard stop) vs HIGH→HOLD (cần Waiver Document) tại 4.2.5 và 6.2; (5) Cập nhật 8.3 ghi nhận Task 3 v2.1.0 đã hoàn thành đồng bộ |
 
 ---
-
+  
 *Document: Task_4_Test_Plan_Strategy_Evaluation.md*
 *Author: Hùng — Nhóm 4 (Testing Strategy)*
 *Date: 22 September 2026 | Version: v1.1.0*
