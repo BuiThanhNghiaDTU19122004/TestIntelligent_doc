@@ -1,4 +1,4 @@
-# TÀI LIỆU : SƠ ĐỒ LUỒNG THỰC THI (WORKFLOW) TESTING INTELLIGENCE (TI)
+[text](TI_Workflow_Hungdz.md) [text](Workflow_Hung.pdf)# TÀI LIỆU : SƠ ĐỒ LUỒNG THỰC THI (WORKFLOW) TESTING INTELLIGENCE (TI)
 **Người trình bày:** Hùng (QA Strategy)
 **Mục tiêu:** Giúp toàn bộ team (DevOps, Architecture, AI, Tooling) hiểu rõ bức tranh toàn cảnh về cách một tác vụ kiểm thử chạy thực tế trong hệ thống TI, từ lúc tiếp nhận đến khi ra quyết định cuối cùng.
 
