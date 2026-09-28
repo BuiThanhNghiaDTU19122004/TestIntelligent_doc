@@ -3049,6 +3049,7 @@ class SlidePresentation {
         this.current = Math.min(this.current, this.slides.length - 1);
         this.stage = document.getElementById('deckStage');
         this.bar = document.getElementById('progressBar');
+        if (!this.stage || !this.bar || this.slides.length === 0) { console.warn('[deck] missing DOM nodes, abort init'); return; }
         this.scale();
         window.addEventListener('resize', () => this.scale());
         this.setupNav();
@@ -3057,14 +3058,15 @@ class SlidePresentation {
     }
 
     scale() {
-        const f = Math.min(innerWidth / 1920, innerHeight / 1080);
+        if (!this.stage) return;
+        const f = Math.min(innerWidth / 1920, innerHeight / 1080) || 1;
         const x = (innerWidth - 1920 * f) / 2, y = (innerHeight - 1080 * f) / 2;
         this.stage.style.transform = `translate(${x}px,${y}px) scale(${f})`;
     }
 
     setupNav() {
         document.addEventListener('keydown', e => {
-            if (e.target.getAttribute('contenteditable') === 'true') return;
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable') === 'true') return;
             if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); this.next(); }
             if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
             if (e.key === 'Home') { e.preventDefault(); this.go(0); }
@@ -3072,6 +3074,7 @@ class SlidePresentation {
         });
         let sx = 0;
         const vp = document.querySelector('.deck-viewport');
+        if (!vp) return;
         vp.addEventListener('touchstart', e => { sx = e.changedTouches[0].screenX; }, { passive: true });
         vp.addEventListener('touchend', e => { const dx = e.changedTouches[0].screenX - sx; if (Math.abs(dx) > 50) dx < 0 ? this.next() : this.prev(); }, { passive: true });
         let wt = false;
@@ -3100,6 +3103,7 @@ class InlineEditor {
     constructor() { this.active = false; this.btn = document.getElementById('editToggle'); this.setup(); }
     setup() {
         const hz = document.querySelector('.edit-hotzone');
+        if (!this.btn || !hz) return;
         let ht = null;
         hz.addEventListener('mouseenter', () => { clearTimeout(ht); this.btn.classList.add('show'); });
         hz.addEventListener('mouseleave', () => { ht = setTimeout(() => { if (!this.active) this.btn.classList.remove('show'); }, 400); });
@@ -3121,8 +3125,25 @@ class InlineEditor {
     }
 }
 
-const deck = new SlidePresentation();
-const editor = new InlineEditor();
+const bootDeck = () => {
+    try {
+        const deck = new SlidePresentation();
+        const editor = new InlineEditor();
+        window.__deck = { deck, editor };
+    } catch (err) {
+        console.error('[deck] init failed:', err);
+        try {
+            document.querySelectorAll('.slide').forEach((s, i) => { if (i === 0) s.classList.add('active', 'visible'); });
+            window.__deckError = String(err && err.stack || err);
+        } catch (e2) { /* noop */ }
+    }
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootDeck);
+} else {
+    bootDeck();
+}
 </script>
 </body>
 </html>
