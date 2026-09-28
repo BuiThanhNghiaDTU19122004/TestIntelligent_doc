@@ -44,7 +44,7 @@
     <mxCell id="jc_lease" parent="jc_box" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3CD;strokeColor=#F59E0B;fontSize=9;" value="Lease + Heartbeat&#xa;Coordinator" vertex="1">
       <mxGeometry height="60" width="100" x="320" y="40" as="geometry" />
     </mxCell>
-    <mxCell id="e_jc_dispatch" edge="1" parent="jc_box" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#F59E0B;fontColor=#E65100;fontSize=9;fontStyle=1;strokeWidth=2;" target="port_launcher" value="[10] Smart Dispatch:&amp;nbsp;&lt;div&gt;ImpactSet ∩ TargetBinding&lt;/div&gt;">
+    <mxCell id="e_jc_dispatch" edge="1" parent="jc_box" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#F59E0B;fontColor=#E65100;fontSize=9;fontStyle=1;strokeWidth=2;" target="port_launcher" value="[10] Smart Dispatch:&amp;nbsp;&lt;div&gt;Verified ImpactSet ∩ TargetBinding&lt;/div&gt;">
       <mxGeometry relative="1" x="-0.0725" y="24" as="geometry">
         <mxPoint as="offset" />
         <Array as="points">
@@ -131,10 +131,10 @@
         <mxPoint x="350" y="135" as="sourcePoint" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="sonnet" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="Claude 5.0 Sonnet&lt;br&gt;S05 Plan + S06 Gen" vertex="1">
+    <mxCell id="sonnet" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="Claude 5.0 Sonnet&lt;br&gt;S03 Impact + S05 Plan + S06 Gen" vertex="1">
       <mxGeometry height="60" width="60" x="325" y="45" as="geometry" />
     </mxCell>
-    <mxCell id="opus" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="Claude Opus 5" vertex="1">
+    <mxCell id="opus" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="Claude Opus 5&lt;br&gt;S04 Deep Risk &amp; Threat Model" vertex="1">
       <mxGeometry height="60" width="60" x="325" y="155" as="geometry" />
     </mxCell>
     <mxCell id="bed_eval" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="Bedrock Evaluations&lt;br&gt;Groundedness ≥0.80&lt;br&gt;Faithfulness ≥0.85 temp=0.0" vertex="1">
@@ -146,12 +146,12 @@
     <mxCell id="s10_mem" parent="acc_b" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=9;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" value="&lt;b&gt;Knowledge Base&lt;br&gt;&lt;/b&gt;S10 Memory&lt;br&gt;GOLDEN only" vertex="1">
       <mxGeometry height="60" width="60" x="1440" y="60" as="geometry" />
     </mxCell>
-    <mxCell id="e_ac_bedrock" edge="1" parent="acc_b" source="agentcore" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;" target="sonnet" value="[08B] Sonnet&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212)); color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;(Opus if CRITICAL)&lt;/span&gt;">
+    <mxCell id="e_ac_bedrock" edge="1" parent="acc_b" source="agentcore" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;" target="sonnet" value="[08B] AI Review: Blast Radius &amp; ImpactSet&lt;br&gt;(Sonnet / Opus if CRITICAL)">
       <mxGeometry relative="1" x="0.2177" as="geometry">
         <mxPoint as="offset" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="e_bedrock_eval" edge="1" parent="acc_b" source="sonnet" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="bed_eval" value="[09A] TestPlan+Cases">
+    <mxCell id="e_bedrock_eval" edge="1" parent="acc_b" source="sonnet" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="bed_eval" value="[09A] ImpactSet + TestPlan + Cases">
       <mxGeometry relative="1" x="-0.3333" as="geometry">
         <mxPoint as="offset" />
         <Array as="points">
@@ -303,7 +303,7 @@
         </Array>
       </mxGeometry>
     </mxCell>
-    <mxCell id="e_sast_jc" edge="1" parent="1" source="r1_box" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#EF4444;fontSize=9;dashed=1;" target="jc_box" value="[07B] ImpactSet+RiskTier">
+    <mxCell id="e_sast_jc" edge="1" parent="1" source="r1_box" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#EF4444;fontSize=9;dashed=1;" target="jc_box" value="[07B] SecurityFindings&lt;div&gt;(SAST/CVE/Secrets)&lt;/div&gt;">
       <mxGeometry relative="1" as="geometry">
         <Array as="points">
           <mxPoint x="170.06" y="950.06" />
@@ -322,7 +322,7 @@
         <mxPoint x="1330" y="380" as="targetPoint" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="e_eval_jc" edge="1" parent="1" source="bed_eval" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;dashed=1;" target="jc_resolver" value="[09C] Quality OK">
+    <mxCell id="e_eval_jc" edge="1" parent="1" source="bed_eval" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#01A88D;fontSize=9;dashed=1;" target="jc_resolver" value="[09C] Quality OK +&lt;div&gt;Verified ImpactSet&lt;/div&gt;">
       <mxGeometry relative="1" as="geometry">
         <Array as="points">
           <mxPoint x="710" y="490" />
@@ -402,7 +402,7 @@
         <mxPoint x="180" y="280" as="targetPoint" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="e_jc_ac" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;fontSize=9;fontStyle=1;" target="agentcore" value="[08A] Cross-Account IAM">
+    <mxCell id="e_jc_ac" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;fontSize=9;fontStyle=1;" target="agentcore" value="[08A] Context + SecurityFindings&lt;div&gt;(Cross-Account IAM)&lt;/div&gt;">
       <mxGeometry relative="1" x="0.2545" y="-19" as="geometry">
         <mxPoint as="offset" />
         <Array as="points">

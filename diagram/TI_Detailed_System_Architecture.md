@@ -4,7 +4,7 @@
 > **Phiên bản:** v2.0.0-Master-Sync · **Ngày cập nhật:** 2026-09-28  
 > **Căn cứ đối soát trực tiếp:** [TI_System_Architecture.drawio](file:///c:/Users/T14S/TI/TestIntelligent_doc/diagram/TI_System_Architecture.drawio)  
 > **Hình ảnh sơ đồ kiến trúc:** [TI_System_Architecture.png](file:///c:/Users/T14S/TI/TestIntelligent_doc/diagram/TI_System_Architecture.png)  
-> **Kỷ luật kiến trúc:** Bám sát 100% cấu trúc, ký hiệu, phân vùng và chuỗi mũi tên đánh số `[01]` đến `[12D]` từ sơ đồ Draw.io gốc; tập trung phân tích kỹ thuật từ đầu đến cuối sơ đồ, loại bỏ nội dung dàn trải.
+> **Kỷ luật kiến trúc:** Bám sát 100% cấu trúc, ký hiệu, phân vùng và chuỗi mũi tên đánh số `[01]` đến `[12D]` từ sơ đồ Draw.io gốc; chuẩn hóa luồng `ImpactSet` đi qua AI Semantic Review tại Account B trước khi Smart Dispatch.
 
 ---
 
@@ -41,25 +41,26 @@ Toàn bộ hệ thống được chia thành 4 phân vùng độc lập, cách l
 │    • Web Portal: Next.js (:8001) Live Reporting Dashboard                                              │
 │    • VPC Endpoints: 3 Interface Endpoints (ECR, Logs, STS ~$22/mo) + 1 S3 Gateway Endpoint ($0)        │
 └───────────────────────┬───────────────────────────────────────────────┬────────────────────────────────┘
-                        │ [08A] Cross-Account IAM                       │ [10] Smart Dispatch
+                        │ [08A] Context + SecurityFindings              │ [10] Smart Dispatch
+                        │       (Cross-Account IAM)                     │      (Verified ImpactSet ∩ Binding)
                         ▼                                               ▼
 ┌──────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────┐
 │ 3. AWS ACCOUNT B — us-east-1 (AI Brain)      │ │ 4. SANDBOX EXECUTION VPC — ap-southeast-1 (Domain D2) │
 │    • AgentCore Harness: TIJobRunner          │ │    • Network: DENY ALL EGRESS (--network none)        │
-│    • Bedrock Models: Claude 5.0 Sonnet &     │ │    • ECS RunTask Port Launcher (IsolatedRunner Law 23)│
-│      Claude Opus 5 (AI Threat Modeling)      │ │    • 6 Trục Runner Thực Thi Task-per-Job:             │
-│    • Amazon Bedrock Evaluations              │ │      - Trục 1: D5a Security (Semgrep+Trivy+Gitleaks)  │
-│      (Groundedness ≥0.80, Faithfulness ≥0.85)│ │      - Trục 2: API Functional & Fuzzing                │
-│    • AWS Secrets Manager & STS Tokens        │ │      - Trục 3: UI Web E2E & A11y (axe-core WCAG)      │
-│    • Knowledge Base S10 Memory (GOLDEN only) │ │      - Trục 4: DB Dual Isolation (Aurora + DynamoDB)  │
-│                                              │ │      - Trục 5: Performance Testing (k6 + 3 Khóa)      │
-│                                              │ │      - Trục 6: D5b DAST Task (W3: ZAP + nuclei)       │
+│    • Bedrock Models:                         │ │    • ECS RunTask Port Launcher (IsolatedRunner Law 23)│
+│      - Claude 5.0 Sonnet (S03 Impact Engine +│ │    • 6 Trục Runner Thực Thi Task-per-Job:             │
+│        S05 Test Plan + S06 Candidate Gen)    │ │      - Trục 1: D5a Security (Semgrep+Trivy+Gitleaks)  │
+│      - Claude Opus 5 (S04 Deep Risk & Threat)│ │      - Trục 2: API Functional & Fuzzing                │
+│    • Amazon Bedrock Evaluations              │ │      - Trục 3: UI Web E2E & A11y (axe-core WCAG)      │
+│      (Groundedness ≥0.80, Faithfulness ≥0.85)│ │      - Trục 4: DB Dual Isolation (Aurora + DynamoDB)  │
+│    • AWS Secrets Manager & STS Tokens        │ │      - Trục 5: Performance Testing (k6 + 3 Khóa)      │
+│    • Knowledge Base S10 Memory (GOLDEN only) │ │      - Trục 6: D5b DAST Task (W3: ZAP + nuclei)       │
 └──────────────────────────────────────────────┘ └───────────────────────────────────────────────────────┘
 ```
 
 * **Phân vùng 1 (External Consumers):** Tác nhân kích hoạt kiểm thử từ bên ngoài (Lập trình viên, QA, CI/CD Pipeline).
 * **Phân vùng 2 (AWS Account A — Singapore):** Tầng điều khiển trung tâm, giữ sổ cái trạng thái công việc (Job Store) và lưu trữ bằng chứng kiểm thử bất biến (Evidence Store).
-* **Phân vùng 3 (AWS Account B — N. Virginia):** Tầng suy luận trí tuệ nhân tạo, điều phối các mô hình Amazon Bedrock và giám định chất lượng kịch bản kiểm thử độc lập chống ảo giác.
+* **Phân vùng 3 (AWS Account B — N. Virginia):** Tầng suy luận trí tuệ nhân tạo, đảm nhiệm **AI Semantic Review (S03 Impact Engine & S04 Risk Engine)** để xác định chính xác phạm vi lan truyền tác động (`ImpactSet`), phân tầng mô hình Claude Sonnet/Opus và giám định chất lượng kiểm thử độc lập chống ảo giác.
 * **Phân vùng 4 (Sandbox Execution VPC — Singapore):** Tầng thực thi cô lập microVM Fargate, áp dụng chính sách mạng cấm ra ngoài Internet (`DENY ALL EGRESS`) để chạy 6 Trục Runner an toàn tuyệt đối.
 
 ---
@@ -95,30 +96,30 @@ Tiến trình vận hành trên sơ đồ Draw.io đi qua 12 nhóm bước chu�
   * **Trivy:** Quét danh mục thư viện phụ thuộc (SCA) phát hiện mã CVE.
   * **Gitleaks:** Quét phát hiện rò rỉ Secrets, Passwords, API Keys trong changeset.
 
-### `[07A]` & `[07B]` Xuất Báo Cáo SARIF & Bóc Tách Rủi Ro (Trục 1 ➔ S3 & Job Controller)
+### `[07A]` & `[07B]` Xuất Báo Cáo SARIF & Bàn Giao SecurityFindings (Trục 1 ➔ S3 & Job Controller)
 * **`[07A] SARIF → S3`:** Trục 1 xuất trực tiếp tệp báo cáo chuẩn hóa **SARIF** lên **Amazon S3 Evidence Store** qua S3 Gateway Endpoint miễn phí ($0) theo cơ chế Direct-to-S3 Offloading.
-* **`[07B] ImpactSet+RiskTier`:** Trục 1 gửi kết quả tóm lược về Job Controller để:
-  * `S03 Impact Engine` xuất danh sách miền bị ảnh hưởng (`ImpactSet`).
-  * `S04 Risk Engine` tính điểm hồi quy và gán nhãn `Risk Tier` (`LOW`, `MEDIUM`, `HIGH`, hoặc `CRITICAL`).
+* **`[07B] SecurityFindings`:** Trục 1 gửi danh sách phát hiện an ninh tĩnh (`SecurityFindings`: danh mục lỗ hổng SAST, CVE packages và secret leaks) về cho Job Controller.
+  * *Lưu ý kiến trúc:* Trục 1 là công cụ quét tĩnh theo pattern-matching, **không tự ý suy diễn `ImpactSet` nghiệp vụ**. Trục 1 chỉ cung cấp dữ liệu bằng chứng an ninh thô cho bước tiếp theo.
 
-### `[08A]` & `[08B]` Ủy Quyền Xử Lý Sang Tầng Trí Tuệ Nhân Tạo (Job Controller ➔ Account B Bedrock)
-* **`[08A] Cross-Account IAM`:** Job Controller chuyển giao ngữ cảnh kiểm thử và giới hạn token (Token Budget) sang **AgentCore Harness (TIJobRunner)** tại Account B (`us-east-1`) qua IAM STS AssumeRole ngắn hạn.
-* **`[08B] Sonnet (Opus if CRITICAL)`:** AgentCore kích hoạt phân tầng mô hình Bedrock:
-  * Mặc định gọi **Claude 5.0 Sonnet** để phân tích S05 (Test Planning) và sinh mã kịch bản S06 (Candidate Test Cases).
-  * Nếu `Risk Tier == CRITICAL` (từ bước S04), kích hoạt bổ sung **Claude Opus 5** để thực hiện AI Threat Modeling chuyên sâu.
+### `[08A]` & `[08B]` AI Semantic Review: Tính Toán Blast Radius & ImpactSet (Job Controller ➔ Account B Bedrock)
+* **`[08A] Context + SecurityFindings`:** Job Controller chuyển giao toàn bộ ngữ cảnh PR Changeset (Git diff, OpenAPI spec, SQL migration) kèm theo `SecurityFindings` từ Trục 1 sang **AgentCore Harness (TIJobRunner)** tại Account B (`us-east-1`) qua IAM STS AssumeRole ngắn hạn.
+* **`[08B] AI Review: Blast Radius & ImpactSet (Sonnet / Opus if CRITICAL)`:**
+  * **Claude 5.0 Sonnet** đảm nhiệm **AI Semantic Code Review (S03 Impact Engine)**: Phân tích AST, Call Graph và Dependency Graph để xác định phạm vi lan truyền tác động thực sự, từ đó sinh ra đối tượng chuẩn tắc **`ImpactSet`** (chỉ rõ chính xác các domain và endpoints bị ảnh hưởng: API, UI, Database, hay Performance).
+  * **S04 Risk Engine:** Đánh giá mức độ rủi ro tổng hợp từ `SecurityFindings` (D5a) và độ phức tạp mã nguồn để gán nhãn `Risk Tier` (`LOW`, `MEDIUM`, `HIGH`, hoặc `CRITICAL`). Nếu phát hiện lỗ hổng nghiêm trọng hoặc rò rỉ secret, kích hoạt bổ sung **Claude Opus 5** để thực hiện AI Threat Modeling chuyên sâu.
+  * Sinh kế hoạch kiểm thử (**S05 Test Planning**) và kịch bản candidate (**S06 Candidate Generation**) bám sát chính xác `ImpactSet` vừa sinh.
 
-### `[09A]`, `[09B]` & `[09C]` Giám Định Kép Chất Lượng AI (Bedrock ➔ Evaluations ➔ S3 & Controller)
-* **`[09A] TestPlan+Cases`:** Claude Sonnet gửi toàn bộ kế hoạch và test case candidate sang **Amazon Bedrock Evaluations** (Module `TIRunnerGroundness`).
+### `[09A]`, `[09B]` & `[09C]` Giám Định Kép & Trả Về Verified ImpactSet (Bedrock ➔ Evaluations ➔ S3 & Controller)
+* **`[09A] ImpactSet + TestPlan + Cases`:** Claude Sonnet gửi `ImpactSet`, kế hoạch kiểm thử và candidate test cases sang **Amazon Bedrock Evaluations** (Module `TIRunnerGroundness`).
 * **`[09B] Eval OK → S3`:** Bedrock Evaluations chạy thuật toán độc lập với tham số cố định `temperature: 0.0` (Greedy Decoding) để đo:
-  * $\mathbf{GroundednessScore \ge 0.80}$ (chống AI ảo giác, tự bịa API không tồn tại).
+  * $\mathbf{GroundednessScore \ge 0.80}$ (chống AI ảo giác, tự bịa API/Field không tồn tại).
   * $\mathbf{FaithfulnessScore \ge 0.85}$ (trung thực với logic nghiệp vụ).
   * Các kịch bản đạt chuẩn được lưu thẳng vào S3 Evidence Store.
-* **`[09C] Quality OK`:** Bedrock Evaluations gửi tín hiệu xác nhận chất lượng AI hợp lệ về `TenantBinding Resolver` của Job Controller.
+* **`[09C] Quality OK + Verified ImpactSet`:** Bedrock Evaluations gửi tín hiệu xác nhận chất lượng AI hợp lệ kèm theo **`Verified ImpactSet`** và `Risk Tier` về `TenantBinding Resolver` của Job Controller (Account A).
 
 ### `[10]` Điều Phối Thông Minh Kích Hoạt Runners (Job Controller ➔ Port Launcher ➔ Runners)
 * **Thành phần:** Job Controller ➔ `port_launcher` ➔ Cụm 6 Trục Runner trong Sandbox VPC.
-* **Công thức Smart Dispatching:** $\mathbf{Target = ImpactSet \cap TargetBinding}$.
-* **Hành động:** Job Controller chỉ gọi ECS RunTask (`IsolatedRunner` Law 23) để kích hoạt **chính xác các Trục Runner bị ảnh hưởng** bởi changeset. Các miền không dính líu được đánh dấu `SKIPPED` ngay lập tức, tiết kiệm 100% tài nguyên compute.
+* **Công thức Smart Dispatching:** $\mathbf{Target = Verified\ ImpactSet \cap TargetBinding}$.
+* **Hành động:** Job Controller chỉ gọi ECS RunTask (`IsolatedRunner` Law 23) để kích hoạt **chính xác các Trục Runner nằm trong `Verified ImpactSet` do AI xác định**. Các miền không bị tác động được đánh dấu `SKIPPED` ngay lập tức, tiết kiệm 100% tài nguyên compute.
 
 ### `[11A]` & `[11B]` Cơ Chế Direct-to-S3 Offloading & Envelope Metadata (Runners ➔ S3 & Controller)
 * **`[11A] Direct-to-S3 Offloading` (Law 16):** Toàn bộ dữ liệu artifact nặng (ảnh PNG, video MP4, Playwright traces, log k6, báo cáo DAST) được các Runner đẩy thẳng lên S3 Object Lock qua S3 Gateway Endpoint ($0).
@@ -152,7 +153,7 @@ Mỗi trục là một container Fargate task-per-job độc lập, chạy trong
 └─────────────────┴─────────────────┴─────────────────┴─────────────────┴───────────────────┴─────────────────────┘
 ```
 
-1. **Trục 1: D5a Security Task (`r1_box`):** `Semgrep OSS` (quét AST Git diff 2–5s) + `Trivy` (quét CVE phụ thuộc) + `Gitleaks` (quét secrets). Xuất file chuẩn SARIF lên S3 (`[07A]`).
+1. **Trục 1: D5a Security Task (`r1_box`):** `Semgrep OSS` (quét AST Git diff 2–5s) + `Trivy` (quét CVE phụ thuộc) + `Gitleaks` (quét secrets). Xuất file chuẩn SARIF lên S3 (`[07A]`) và gửi `SecurityFindings` về Controller (`[07B]`).
 2. **Trục 2: API Functional & Fuzzing (`r2_box`):** `Schemathesis` (fuzzing hàng nghìn payload biên từ OpenAPI spec) + `Playwright API` (thực thi luồng nghiệp vụ E2E có trạng thái).
 3. **Trục 3: UI Web E2E & Accessibility (`r3_box`):** `Playwright Headless Chromium` (chạy kịch bản người dùng E2E) + `axe-core Engine` (nhúng trình duyệt quét tiêu chuẩn tiếp cận WCAG 2.1 AA, tỷ lệ báo sai bằng 0).
 4. **Trục 4: Database Dual Isolation (`r4_box`):** `Amazon Aurora Serverless v2 Clone` (clone copy-on-write trong < 60s để test Flyway migration SQL, sau đó tự hủy) + `DynamoDB Local / Ephemeral Table` (bảng tạm tự hủy TTL 1 giờ).
@@ -171,7 +172,7 @@ Sơ đồ được thiết kế và đồng bộ chuẩn xác tại tệp gốc 
 
 ### 4.2. Bản Đồ Trực Quan Các Phân Vùng & Chuỗi Kết Nối [01] ➔ [12D]
 
-Bản đồ dưới đây mô phỏng chính xác cấu trúc hình học và vị trí các khối trên sơ đồ Draw.io:
+Bản đồ dưới đây mô phỏng chính xác cấu trúc hình học và chuỗi luồng đi qua AI Semantic Review:
 
 ```text
 ========================================================================================================================
@@ -187,23 +188,23 @@ Developer / QA  ·  TI CLI  ·  CI/CD Settings / Runner
                   ▼ [04] PENDING bản ghi                ▼ [05] Enqueue job
              RDS PostgreSQL                        Job Controller (jc_box)
              (rds_pg: db.t4g.micro)                  ├─ jc_ecs (State Machine)
-                                                     ├─ jc_resolver (Smart Dispatch)
+                                                     ├─ jc_resolver (TenantBinding & Smart Dispatch)
                                                      └─ jc_lease (Worker Lease)
                                                         │
        ┌────────────────────────────────────────────────┼────────────────────────────────────────┐
-       ▼ [06] D5a Security                              ▼ [08A] Cross-Account IAM                ▼ [10] Smart Dispatch
+       ▼ [06] D5a Security                              ▼ [08A] Context + SecurityFindings       ▼ [10] Smart Dispatch
 =========================================  =============================================  ==============================
 [SANDBOX EXECUTION VPC] (sandbox)          [AWS ACCOUNT B: us-east-1] (zone_acct_b)       [PORT LAUNCHER] (port_launcher)
 Domain D2 · DENY ALL EGRESS                 AGENTCORE AI BRAIN                             ECS RunTask (Law 23)
 Private Subnet · 3 VPCE + S3 Gateway $0      AgentCore Harness (agentcore)                  │
-                                              │ [08B] Sonnet / Opus                         ▼
-  Trục 1: D5a Security (r1_box)               Bedrock Models (bedrock_models)              CỤM 6 TRỤC RUNNER SANDBOX:
-    • Semgrep OSS (SAST 2-5s)                 │ [09A] TestPlan + Cases                       • Trục 1: D5a Security
+                                              │ [08B] AI Review: Blast Radius & ImpactSet   ▼
+  Trục 1: D5a Security (r1_box)               Bedrock Models (Sonnet + Opus if CRITICAL)   CỤM 6 TRỤC RUNNER SANDBOX:
+    • Semgrep OSS (SAST 2-5s)                 │ [09A] ImpactSet + TestPlan + Cases           • Trục 1: D5a Security
     • Trivy (CVE Packages)                    Bedrock Evaluations (bedrock_eval)             • Trục 2: API Fuzzing
     • Gitleaks (Secrets)                      (Groundedness ≥0.80, Faith. ≥0.85)             • Trục 3: UI Web & axe A11y
        │──► [07A] SARIF ──► S3 Evidence               │──► [09B] Eval OK ──► S3 Evidence     • Trục 4: Aurora v2 Clone
-       └──► [07B] ImpactSet+RiskTier ──► Controller   └──► [09C] Quality OK ──► Controller   • Trục 5: Perf k6 (3 Khóa)
-                                                                                             • Trục 6: D5b DAST (ZAP)
+       └──► [07B] SecurityFindings ──► Controller     └──► [09C] Quality OK + Verified       • Trục 5: Perf k6 (3 Khóa)
+                                                                 ImpactSet ──► Controller    • Trục 6: D5b DAST (ZAP)
                                                                                              │
                                                                                              ├──► [11A] Direct-to-S3 ($0)
                                                                                              └──► [11B] Envelope ~2KB ──┐
@@ -237,13 +238,13 @@ Private Subnet · 3 VPCE + S3 Gateway $0      AgentCore Harness (agentcore)     
 | **`[05]`** | **Enqueue Job** | TI API v2 ➔ Job Controller | In-VPC Private Service | Bàn giao ngữ cảnh `job_id` | < 10ms | Nội bộ VPC ($0) |
 | **`[06]`** | **D5a Security Task** | Job Controller ➔ Trục 1 | **Semgrep + Trivy + Gitleaks** | Kích hoạt quét tĩnh PR-time trong Sandbox | **2 – 5s** | Compute Fargate per-second |
 | **`[07A]`**| **SARIF → S3** | Trục 1 ➔ Amazon S3 | S3 Gateway Endpoint ($0) | Báo cáo chuẩn **SARIF** (CWE, CVE, Secrets) | < 500ms | S3 Standard $0.023/GB |
-| **`[07B]`**| **ImpactSet+RiskTier**| Trục 1 ➔ Job Controller | In-VPC JSON | Object `ImpactSet` + Hạng `Risk Tier` | < 100ms | Nội bộ VPC ($0) |
-| **`[08A]`**| **Cross-Account IAM** | Job Controller ➔ AgentCore | AWS STS AssumeRole | Short-lived Role token + Task Context | < 200ms | Miễn phí IAM liên account |
-| **`[08B]`**| **Sonnet / Opus Gen** | AgentCore ➔ Bedrock | **Claude 5.0 Sonnet** (Opus nếu CRITICAL) | TestPlan cấu trúc + TestCases candidate | **5 – 15s** | Multi-turn: ~$0.045 – $0.085/job |
-| **`[09A]`**| **TestPlan+Cases** | Bedrock ➔ Evaluations | Bedrock Evaluations API | Chuyển bộ kịch bản candidate test cases | < 100ms | Nội bộ Bedrock |
+| **`[07B]`**| **SecurityFindings** | Trục 1 ➔ Job Controller | In-VPC JSON | Danh sách phát hiện lỗ hổng SAST/CVE/Secrets | < 100ms | Nội bộ VPC ($0) |
+| **`[08A]`**| **Context + SecurityFindings** | Job Controller ➔ AgentCore | AWS STS AssumeRole | Changeset + SecurityFindings + Token Budget | < 200ms | Miễn phí IAM liên account |
+| **`[08B]`**| **AI Review: Impact & TestGen**| AgentCore ➔ Bedrock | **Claude 5.0 Sonnet** (Opus nếu CRITICAL) | S03 Blast Radius ➔ `ImpactSet` + Test Plan | **5 – 15s** | Multi-turn: ~$0.045 – $0.085/job |
+| **`[09A]`**| **ImpactSet + TestPlan + Cases**| Bedrock ➔ Evaluations | Bedrock Evaluations API | Chuyển `ImpactSet` + Candidate Test Cases | < 100ms | Nội bộ Bedrock |
 | **`[09B]`**| **Eval OK → S3** | Evaluations ➔ S3 Evidence | S3 Gateway Endpoint | Lưu JSON TestPlan/TestCases đạt chuẩn | < 500ms | S3 Standard $0.023/GB |
-| **`[09C]`**| **Quality OK** | Evaluations ➔ Job Controller | Cross-account API | Báo cáo Groundedness ≥0.80 & Faithfulness ≥0.85 | < 500ms | In-process ($0) |
-| **`[10]`** | **Smart Dispatch** | Controller ➔ Port Launcher | ECS RunTask (`IsolatedRunner`) | Lệnh RunTask: `ImpactSet ∩ TargetBinding` | < 1s | In-process ($0) |
+| **`[09C]`**| **Quality OK + Verified ImpactSet**| Evaluations ➔ Job Controller | Cross-account API | Báo cáo Groundedness ≥0.80 + Verified `ImpactSet` | < 500ms | In-process ($0) |
+| **`[10]`** | **Smart Dispatch** | Controller ➔ Port Launcher | ECS RunTask (`IsolatedRunner`) | Lệnh RunTask: `Verified ImpactSet ∩ TargetBinding` | < 1s | In-process ($0) |
 | **`[11A]`**| **Direct-to-S3** | 6 Runners ➔ S3 Evidence | S3 Gateway Endpoint ($0) | Raw Artifacts (PNG, Video, Traces, Logs, DAST) | < 2s | S3 Object Lock Compliance |
 | **`[11B]`**| **Envelope ~2KB** | 6 Runners ➔ Job Controller | Private Link REST / JSON | JSON Metadata Envelope (~2 KB, SHA-256) | < 100ms | Xóa sổ 100% rủi ro ngộp ổ EBS |
 | **`[12A]`**| **Metrics+SHA256** | Controller ➔ Decision Gate | In-process Engine | Bảng tổng hợp chỉ số kiểm thử | < 50ms | In-process ($0) |
@@ -314,6 +315,6 @@ Mô hình AI chỉ phát các tham số biểu tượng (Symbolic Params), tuy�
 
 Tài liệu đặc tả kiến trúc chi tiết v2.0 này đã đồng bộ hoàn hảo với sơ đồ [TI_System_Architecture.drawio](file:///c:/Users/T14S/TI/TestIntelligent_doc/diagram/TI_System_Architecture.drawio):
 1. **Khớp 1-1 với sơ đồ:** Bám sát tuần tự từ External $\rightarrow$ Account A (Control Plane) $\rightarrow$ Account B (AI Brain) $\rightarrow$ Sandbox Execution VPC (6 Trục Runner).
-2. **Minh bạch luồng dữ liệu:** Định danh chính xác từng mũi tên từ `[01]` đến `[12D]`, làm rõ cơ chế **Direct-to-S3 Offloading** chống tràn ổ đĩa và ranh giới mạng Sandbox DENY ALL EGRESS.
-3. **Phân định an ninh rõ ràng:** Trục 1 D5a (`Semgrep + Trivy + Gitleaks`) chạy tại PR-time xuất SARIF và Trục 6 D5b (`OWASP ZAP + nuclei`) chỉ chạy tại Staging runtime khi có URL sống.
-4. **Cô đọng, thực chiến:** Bỏ hoàn toàn các sơ đồ Mermaid trùng lặp, nhúng trực tiếp sơ đồ kiến trúc hiện tại, tập trung tuyệt đối vào giải pháp kỹ thuật và thông số vận hành.
+2. **Logic ImpactSet chuẩn xác:** Khắc phục triệt để lỗ hổng bỏ qua AI Review; Trục 1 chỉ trả về `SecurityFindings`, AI tại Account B đảm nhiệm **S03 Impact Analysis** sinh `Verified ImpactSet` trước khi Smart Dispatch.
+3. **Minh bạch luồng dữ liệu:** Định danh chính xác từng mũi tên từ `[01]` đến `[12D]`, làm rõ cơ chế **Direct-to-S3 Offloading** chống tràn ổ đĩa và ranh giới mạng Sandbox DENY ALL EGRESS.
+4. **Cô đọng, thực chiến:** Nhúng trực tiếp sơ đồ kiến trúc hiện tại, tập trung tuyệt đối vào giải pháp kỹ thuật và thông số vận hành.
