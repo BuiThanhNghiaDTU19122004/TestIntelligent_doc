@@ -60,8 +60,8 @@ Giai đoạn thu thập và đối soát cuối cùng:
 - **Quy tắc Law 18**: `completed ≠ PASS` (Trạng thái job hoàn tất không có nghĩa là Gate đã thông qua. Khuyến nghị không phải là phê duyệt cuối cùng).
 - **S10 - Production Learning**: Lưu tri thức. Mọi node Memory hiện đều mang nhãn `UNVERIFIED — chưa nghiệm thu` và nguyên tắc là chỉ lưu tri thức đã qua thẩm định `GOLDEN`.
 
-### Yếu tố Con người (Waiver / Override)
-Trong quy trình kiểm soát rủi ro (Human-in-the-loop), nếu Gate xếp loại `HOLD`, người có thẩm quyền (QA Lead) có quyền xem xét bằng chứng và gửi lệnh `Approved Waiver` thông qua API `/actions` để cưỡng chế duyệt phát hành (`PASS`).
+### Yếu tố Con người (Waiver / Override — G-17)
+Trong quy trình kiểm soát rủi ro (Human-in-the-loop), nếu Gate xếp loại `HOLD`, người có thẩm quyền (QA Lead) có quyền xem xét bằng chứng và gửi lệnh `Approved Waiver` thông qua API `/actions` để ghi nhận bản ghi `WaiverDecision` (ghi rõ người duyệt, lý do và tham chiếu bằng chứng). Trạng thái Gate vẫn lưu là `HOLD` kèm ngoại lệ; quyết định phát hành cuối cùng (Release Approval) thuộc về Release Authority / XoraOps, tuân thủ nguyên tắc cốt lõi: *"Khuyến nghị kiểm thử ≠ Phê duyệt phát hành"*.
 
 ---
 

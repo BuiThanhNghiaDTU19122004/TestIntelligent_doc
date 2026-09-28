@@ -124,7 +124,7 @@ Bản thiết kế này chuẩn hóa và tích hợp toàn diện đóng góp t�
 
 ### 2.3. Tầng Trí Tuệ Nhân Tạo & Điều Phối Đánh Giá Nghiệp Vụ: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake
 - **Đóng góp từ Nghĩa (Task 3) & Hùng (Task 4)**:
-  - **Xương sống 10 chặng xử lý (S01–S10)**: Phân định rõ ràng chặng nào dùng Mã cứng Deterministic (S01, S02, S08, S09 hard barrier), chặng nào dùng AI suy luận (S03 semantic, S04 threat modeling, S05 planning, S06 generation), và chặng nào do Tool đo lường (S07 execution).
+  - **Xương sống 10 chặng xử lý (S01–S10)**: Phân định rõ ràng: S01 & S02 là Deterministic tại Account A; S03 Impact & S04 Risk là deterministic chạy tại **Job Controller (Account A - System of Record)** đối soát trên dữ liệu gợi ý từ Harness; S05 Planning & S06 Generation do AI Harness (Account B) đảm nhiệm; S07 Execution do 6 Trục Tool đo lường trong Sandbox; S08 Evidence & S09 Decision Gate do Job Controller đối soát tất định (Law 18: `completed ≠ PASS`).
   - **Chiến lược Dual-Model Tiering 2 cấp (Hợp nhất Sonnet 5 + Opus 5, Loại bỏ Haiku 4.5 theo DEF-X-M03 / M-02)**:
     - `Claude Sonnet 5`: Đảm nhiệm toàn bộ việc xử lý template, trích xuất JSON, lập kế hoạch kiểm thử (S05) và sinh kịch bản candidate chi tiết (S06) với vai trò model chủ lực mặc định.
     - `Claude Opus 5`: Chỉ kích hoạt khi `Risk Tier == CRITICAL` tại S04 để phân tích Threat Modeling và lỗ hổng logic nghiệp vụ tinh vi.
@@ -235,17 +235,17 @@ flowchart TB
     HAR -->|"4. Phát ToolIntent JSON (Không credential)"| GATEWAY
     GATEWAY -->|"5. Trả ToolIntent"| JC
 
-    %% Job Controller tra cứu binding và dispatch ngang hàng
+    %% Job Controller tra cứu binding và smart dispatch
     LEASE --> RESOLVER
-    RESOLVER -->|"6. Direct Dispatch có lease\n(Kèm short-lived STS credentials)"| T_SAST
-    RESOLVER -->|"6. Direct Dispatch có lease"| T_API
-    RESOLVER -->|"6. Direct Dispatch có lease"| T_UI
-    RESOLVER -->|"6. Direct Dispatch có lease"| T_PERF
-    RESOLVER -->|"6. Direct Dispatch có lease"| T_DB
-    RESOLVER -->|"6. Direct Dispatch có lease"| T_DAST
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding\n(Kèm short-lived STS credentials)"| T_SAST
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding"| T_API
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding"| T_UI
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding"| T_PERF
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding\n(DynamoDB Local + Aurora Clone)"| T_DB
+    RESOLVER -->|"6. Smart Dispatch: Verified ImpactSet ∩ TargetBinding\n(Wave 3: Chỉ khi Staging URL sống)"| T_DAST
 
-    %% Kết nối DB Clone
-    T_DB -.->|"Kiểm tra schema & migration"| AURORA_CLONE
+    %% Kết nối DB Clone & Ephemeral NoSQL
+    T_DB -.->|"Kiểm tra schema & migration (Aurora Clone + DynamoDB Local)"| AURORA_CLONE
 
     %% Rào chắn mạng
     RUNNERS -.-> SG_DENY
@@ -372,9 +372,10 @@ sequenceDiagram
         API-->>Caller: 200 OK {state: COMPLETED, gate_result: HOLD / PASS / DO_NOT_PASS}
     end
 
-    opt Nếu Gate Result là HOLD (Khuyến nghị chờ duyệt ngoại lệ - KHÔNG tự động pass)
-        QA->>API: POST /v2/operations/{id}/actions (Submit Approved Waiver)
-        API->>DB: Cập nhật Final Release Decision: PASS (Đủ điều kiện Deploy)
+    opt Nếu Gate Result là HOLD (Cần xem xét ngoại lệ — KHÔNG tự động pass)
+        QA->>API: POST /v2/operations/{id}/actions (Submit Approved Waiver + Lý do + Evidence Ref)
+        API->>DB: Ghi nhận bản ghi WaiverDecision (giữ nguyên gate_result: HOLD)
+        Note over QA,API: Quyết định Release thuộc về Release Authority / XoraOps
     end
 ```
 
@@ -505,7 +506,7 @@ Bảng phân tích chi phí dựa trên đơn giá chính thức của AWS (vớ
 | **Lưu trữ Bằng chứng** | S3 Standard không khóa | **S3 Standard + Object Lock (Compliance Mode)** | ~$3.00 – $5.00 | `CANDIDATE` (Hiện trạng đo 22/09: lưu ổ EBS trên EC2) |
 | **Database Testing** | Testcontainers trên EC2 (tăng cấu hình) | **Aurora Serverless v2 Clone** (chỉ tính theo phút) | ~$10.00 – $20.00 | `CANDIDATE` |
 | **Chi phí AI Token** | Toàn bộ bằng Claude Opus 5 ($15/1M token) | **Claude Dual-Model Tiering (Sonnet 5 / Opus 5)** | Giảm từ $120 $\rightarrow$ ~$35.00 | `INFERRED` (Tối ưu 65–75% chi phí token, bỏ Haiku 4.5 theo M-02) |
-| **TỔNG CỘNG HẠ TẦNG** | **~$450 – $600 / tháng** | **TIẾT KIỆM TỐI ĐA** | **~$90.00 – $122.00 / tháng** | Tiết kiệm ~75% ngân sách |
+| **TỔNG CỘNG HẠ TẦNG** | **~$450 – $600 / tháng** | **TIẾT KIỆM TỐI ĐA** | **~$90.00 – $122.00 / tháng** | `CANDIDATE` (tổng hợp từ các hàng trên; hiện trạng đo 22/09 ghim 8a61cf66 vẫn chạy 1 EC2, tiết kiệm ~75% lý thuyết) |
 
 ---
 
