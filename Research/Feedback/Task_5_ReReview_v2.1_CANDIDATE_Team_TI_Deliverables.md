@@ -246,4 +246,43 @@
 | :--- | :---: | :--- | :--- |
 | 28/09/2026 | v1.0 | Cline (AI reviewer, theo phương pháp Task_5) | Re-review 5 hồ sơ mới (Hung `.md`+`.pdf`, `images/*.drawio`, `Detailed .md`, `v2.1 CANDIDATE` drawio+PNG) theo Checklist A–F; đối chiếu 11 Blocking + 16 Minor; kết luận **CHƯA ĐẠT** (11 Blocking còn OPEN ở ≥1 hồ sơ; 4 mục đã sửa thật trong v2.1); phát hiện **10 mismatch mới** (M-01→M-10) + 3 claim tuyệt đối; nêu 4 câu hỏi P0/P1 phải chốt trước Vòng 2 |
 | 28/09/2026 | v1.1 | Cline | Cập nhật sau khi phát hiện `TI_Master_Architecture_Blueprint.md` **bị sửa giữa lúc review** (09:08:54): bổ sung ghi chú ở §1, sửa số dòng `CodeGuru` L402→**L400**, nâng **M-02 thành P0 mới** (Blueprint "loại bỏ Haiku" ↔ chính bảng FinOps cùng file ↔ `images/*` `m_haiku` ↔ Task 3/4), thêm việc **1b** vào §6.1, đổi `DEF-X-M03` sang **REGRESSION** |
+| 28/09/2026 | v1.2 | Cline (AI reviewer) | Bổ sung sau 2 bản sửa **Blueprint 10:08:23 + Detailed 10:51:57 ngày 28/09** (sau giờ chốt v1.1 09:12): Blueprint đã đóng **DEF-X-001 (CodeGuru→EOL footnote L406), M-02 tự mâu thuẫn (L128↔L507 đã khớp Dual-Model), M-03 (đủ 6 runner L212/W_API L302), M-05 (TTL 5m + heartbeat 60s L354/L357), DEF-S3-M08/M09/M11/D03/D04/D08 (DoS+DevOps L436, Team Data L397, ti-test-packs L441, pre-baked L443, Runtime 18 L447), M-16 (MEM UNVERIFIED L196/L259)**; Detailed **vẫn OPEN** HMAC L35/L77, `--network none` L48/L137/L141, Secrets ở Account B L53, `file:///c:/Users/T14S` L5/L6/L168/L170, `Bám sát 100%` L7, PENDING↔QUEUED, poll `RDS→CI/CD` L219/L252, FinOps không nhãn, thiếu Gateway/UNVERIFIED/pre-baked/Runtime18. Chi tiết xem **§9 (bổ sung v1.2)** trong file này + file gap mới `Task_5_Gap_Closure_Review_v2.2_2026-09-28.md`. Kết luận tổng vẫn **CHƯA ĐẠT** (Vòng 2 chưa mở) nhưng phạm vi OPEN đã thu hẹp rõ rệt về phía Detailed + Hung. |
+
+---
+
+## 9. BỔ SUNG RE-REVIEW v1.2 (28/09/2026 10:55 — SAU 2 BẢN SỬA BLUEPRINT 10:08 + DETAILED 10:51)
+
+> Đọc kèm file gap mới: `Research/Feedback/Task_5_Gap_Closure_Review_v2.2_2026-09-28.md` (danh sách gap còn lại + owner + thứ tự fill).
+
+### 9.1. Cái gì đã đổi so với v1.1 (§1–§5)
+
+| # | v1.1 đã viết | Thực tế sau bản sửa 10:08/10:51 | Trạng thái mới |
+| :--: | :--- | :--- | :--: |
+| 1 | Blueprint L400 "vẫn CodeGuru" | L406 nay là **footnote EOL đúng chuẩn** (*CodeGuru EOL 20/11/2025 — KHÔNG dùng; pre-scan = Semgrep ruleset rút gọn + Gitleaks*) | ✅ **FIXED trong Blueprint** (lỗi còn lại nằm ở `Hung/TI_Workflow_Hungdz.md` L28) |
+| 2 | Blueprint "tự mâu thuẫn L128↔L478 (Haiku)" | L128 + L507 nay **khớp nhau**: Dual-Model Sonnet 5/Opus 5, bỏ Haiku, FinOps `INFERRED (bỏ Haiku 4.5 theo M-02)` | ✅ **FIXED nội bộ Blueprint**; còn lệch liên-file với `images/*` node `m_haiku` (chờ Hoàng xóa/sync) |
+| 3 | Blueprint "chỉ 5 runner" | L212 `T_API`, L302 `W_API` → **đủ 6 runner** (D5a/API/UI/Perf/DB/DAST) | ✅ **FIXED trong Blueprint** |
+| 4 | M-05 "2 hồ sơ ghi 2 kiểu lease" | Blueprint L354 `RUNNING (Lease TTL 5 mins)` + L357 `loop Heartbeat 60s, Lease TTL 5m` = **2 tham số khác nhau, ghi rõ** | ✅ **FIXED trong Blueprint** (mẫu để copy sang Detailed/Hùng) |
+| 5 | `Detailed .md` "chưa nhận dòng sửa nào (mtime 27/09 19:42)" | File nay mtime **28/09 10:51:57** — đã có sửa (6 trục, S03/S04 tại JC, S09 có Faithfulness, công thức dispatch) nhưng **chưa chạm** HMAC/`--network none`/Secrets-B/file-link/PENDING/poll/FinOps | 🟡 **PARTIAL** — §3.2 trong file này ("Ba hồ sơ chưa sửa gì") nay **hết hiệu lực cho Detailed**, thay bằng bảng §9.2 dưới đây |
+| 6 | "Blueprint vẫn `[OBSERVED]` 2 zone" | Blueprint mermaid L166/L185 nay là **`[CANDIDATE]`** cả 2 zone (đúng); lỗi `[OBSERVED]` còn ở `images/*.drawio` | 🟡 **PARTIAL** — thu hẹp về images |
+
+### 9.2. Ma trận Blocking cập nhật (chỉ 2 tài liệu thuộc phạm vi yêu cầu lần này)
+
+| ID | Blueprint (10:08) | Detailed (10:51) | Ghi chú |
+| :--- | :--: | :--: | :--- |
+| DEF-X-001 CodeGuru | ✅ footnote EOL L406 | ✅ (không nhắc CodeGuru) | Còn OPEN duy nhất ở Hung L28 |
+| DEF-X-004 mạng | ✅ Private Subnet + SG Deny All + VPCE L123/L206/L421 | ❌ `--network none` L48/L137/L141 | Detailed copy câu Blueprint L421 |
+| DEF-X-005 VPCE | ✅ trong Sandbox L207 | ❌ §1 ghi VPCE ở Account A L42 ↔ §3 Sandbox | Detailed sửa §1 theo v2.1 |
+| DEF-X-006 S03/S04 | 🟡 JC/Account A L350 (khớp Detailed) nhưng §2.3 L127 vẫn ghi "S03 semantic, S04 threat modeling" là AI | 🟡 Account A L100–L102 (khớp Blueprint) | Còn xung đột với Hung (Account B) → vẫn P0, xem gap G-01 |
+| DEF-X-007 Secrets | ✅ (không đặt Secrets ở B; TenantBinding server-side L479) | ❌ Secrets Manager ở Account B L53 | Detailed chuyển Secrets sang A (copy v2.1 L110) |
+| DEF-X-008 CodeBuild | ✅ (không còn) | ❌ **không** (bản thân Detailed không ghi CodeBuild; lỗi là ở slides/report cũ — Detailed chỉ cần giữ đúng Fargate) → ✅ | Đổi trạng thái Detailed thành ✅ |
+| DEF-X-009 Gate | 🟡 S09 có Faithfulness ±0.03 L367, tách state/gate_result L368/L372, Waiver L375 | ❌ gộp COMPLETED+gate L217/L250, thiếu Waiver/±0.03/6 chỉ số/completed≠PASS | Detailed copy hộp Gate Blueprint L367–L378 |
+| DEF-X-010 FinOps | 🟡 có cột Nhãn (TOTAL row thiếu) | ❌ không cột Nhãn | Detailed thêm cột Nhãn |
+| DEF-S3-011 pre-scan | ✅ chốt pre-scan Semgrep rút gọn+Gitleaks L406 + footnote gap L414 | 🟡 có [06]/[07B] nhưng thiếu footnote gap | Detailed copy footnote Blueprint L414–L416 |
+
+### 9.3. Điều kiện chuyển Vòng 2 (cập nhật, thay §7 cũ ở phần phạm vi 2 tài liệu này)
+
+1. Detailed sửa 8 điểm: HMAC→API verify; `--network none`→câu chuẩn; Secrets→Account A; link tương đối; PENDING→`queued`; poll `CI→API→RDS`; FinOps thêm cột Nhãn; bổ sung Gateway + UNVERIFIED + pre-baked + Runtime 18 + Team Data + ti-test-packs + DoS/DevOps (copy nguyên §4.5/4.6 Blueprint).
+2. Chốt 4 câu P0/P1 (§7 v1.1 giữ nguyên): S03/S04 (A hay B); pre-scan mấy lần; lease/heartbeat; `queued` + tách `state`/`gate_result`.
+3. Hùng sửa L28 (CodeGuru→Inspector/Semgrep/Trivy/Gitleaks) + Phase 2 (S03/S04) + bổ sung Trục API + câu mạng chuẩn (ngoài phạm vi 2 tài liệu nhưng chặn Vòng 2).
+4. Khai tử drawio cũ (`TI_System_Architecture.drawio`) bằng nhãn SUPERSEDED + sửa link Detailed sang v2.1.
 
