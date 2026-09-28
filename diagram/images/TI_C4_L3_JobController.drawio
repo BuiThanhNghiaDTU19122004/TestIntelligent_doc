@@ -63,7 +63,7 @@
           <mxGeometry x="20" y="182" width="300" height="52" as="geometry" />
         </mxCell>
 
-        <mxCell id="term_ctrl" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Final: COMPLETED / FAILED&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px; color: #1b5e20;&quot;&gt;Khóa sổ job; đính kèm kết quả Gate S09&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12.5;fillColor=#e8f5e9;strokeColor=#81c784;fontColor=#1b5e20;" vertex="1" parent="col2_box">
+        <mxCell id="term_ctrl" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Job State: COMPLETED / FAILED&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px; color: #1b5e20;&quot;&gt;Hoàn tất kỹ thuật · Tách biệt Gate S09 (Law 18: completed &amp;ne; PASS)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12.5;fillColor=#e8f5e9;strokeColor=#81c784;fontColor=#1b5e20;" vertex="1" parent="col2_box">
           <mxGeometry x="20" y="252" width="300" height="52" as="geometry" />
         </mxCell>
 
@@ -110,24 +110,28 @@
           <mxGeometry x="1170" y="95" width="340" height="425" as="geometry" />
         </mxCell>
 
-        <mxCell id="w_sast" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Task: Semgrep SAST&lt;/b&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt; — Semgrep, Trivy, Gitleaks&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
-          <mxGeometry x="15" y="42" width="310" height="40" as="geometry" />
+        <mxCell id="w_sast" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: Semgrep SAST&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Semgrep, Trivy, Gitleaks&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="36" width="310" height="35" as="geometry" />
         </mxCell>
 
-        <mxCell id="w_ui" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Task: Playwright UI&lt;/b&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt; — Playwright Headless, axe a11y&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
-          <mxGeometry x="15" y="92" width="310" height="40" as="geometry" />
+        <mxCell id="w_api" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: Schemathesis / Playwright API&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Trục 2&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="78" width="310" height="35" as="geometry" />
         </mxCell>
 
-        <mxCell id="w_perf" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Task: k6 Load Test&lt;/b&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt; — Distributed DLT, k6 Engine&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
-          <mxGeometry x="15" y="142" width="310" height="40" as="geometry" />
+        <mxCell id="w_ui" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: Playwright UI&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Playwright Headless, axe a11y&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="120" width="310" height="35" as="geometry" />
         </mxCell>
 
-        <mxCell id="w_db" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Task: Flyway DB&lt;/b&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt; — Flyway trên Aurora Clone&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
-          <mxGeometry x="15" y="192" width="310" height="40" as="geometry" />
+        <mxCell id="w_perf" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: k6 Load Test&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Distributed DLT, k6 Engine&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="162" width="310" height="35" as="geometry" />
         </mxCell>
 
-        <mxCell id="w_dast" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Task: ZAP / Nuclei DAST&lt;/b&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt; — Scan trên Staging URL&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
-          <mxGeometry x="15" y="242" width="310" height="40" as="geometry" />
+        <mxCell id="w_db" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: Flyway DB&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Flyway trên Aurora Clone&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="204" width="310" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="w_dast" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Task: ZAP / Nuclei DAST&lt;/b&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt; — Scan trên Staging URL&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#1b5e20;" vertex="1" parent="col4_box">
+          <mxGeometry x="15" y="246" width="310" height="35" as="geometry" />
         </mxCell>
 
         <mxCell id="worker_badge" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;Interface: IsolatedRunner (Law 23)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;Mỗi task là 1 MicroVM độc lập tự hủy. Không lồng Fargate!&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#e8f5e9;strokeColor=#81c784;fontColor=#1b5e20;fontSize=11.5;align=center;" vertex="1" parent="col4_box">
@@ -190,6 +194,9 @@
         <mxCell id="e_c3_w1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#388e3c;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="direct_call" target="w_sast">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="e_c3_w_api" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#388e3c;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="direct_call" target="w_api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="e_c3_w2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#388e3c;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="direct_call" target="w_ui">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
@@ -205,6 +212,9 @@
 
         <!-- Col 4 to Col 5 (Converging to Raw Collector) -->
         <mxCell id="e_w1_c5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#7e57c2;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="w_sast" target="col_raw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_w_api_c5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#7e57c2;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="w_api" target="col_raw">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_w2_c5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Segoe UI, Arial, sans-serif;strokeColor=#7e57c2;strokeWidth=1.5;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="w_ui" target="col_raw">

@@ -10,7 +10,7 @@
 | **Ngày hoàn thiện** | 25 tháng 9 năm 2026 |
 | **Các bên đóng góp** | • **Hà Tây Nguyên** (DevOps): Triết lý Ports & Adapters, Plugin & Interface Abstraction.<br>• **Hoàng** (Task 2 — Architecture) & **Trang** (Task 1 — Tooling): Hạ tầng AWS 2 Accounts, Fargate Sandbox, VPC Endpoints & FinOps.<br>• **Nghĩa** (Task 3 — AI Model) & **Hùng** (Task 4 — QA Strategy): Chuỗi S01–S10, Model Tiering, ToolIntent Handshake, Tiêu chuẩn ISTQB CT-AI/GenAI. |
 | **Phê duyệt bởi** | Tan.Thai (Product Architect) · Anh Quang (Project Lead / Delivery) |
-| **Trạng thái tài liệu** | 🟢 **APPROVED / MASTER BLUEPRINT** (Sẵn sàng triển khai Spike P4 & Wave 1) |
+| **Trạng thái tài liệu** | 🟢 **APPROVED / MASTER BLUEPRINT** *(Duyệt thiết kế kiến trúc đích CANDIDATE; KHÔNG đồng nghĩa nghiệm thu hệ thống — theo dõi cổng #97. Hiện trạng đo 22/09 ghim 8a61cf66: 1 EC2 chứa cả API :8000 + Portal :8001)* |
 
 ---
 
@@ -125,10 +125,10 @@ Bản thiết kế này chuẩn hóa và tích hợp toàn diện đóng góp t�
 ### 2.3. Tầng Trí Tuệ Nhân Tạo & Điều Phối Đánh Giá Nghiệp Vụ: Chuỗi S01–S10, Bedrock Model Tiering & ToolIntent Handshake
 - **Đóng góp từ Nghĩa (Task 3) & Hùng (Task 4)**:
   - **Xương sống 10 chặng xử lý (S01–S10)**: Phân định rõ ràng chặng nào dùng Mã cứng Deterministic (S01, S02, S08, S09 hard barrier), chặng nào dùng AI suy luận (S03 semantic, S04 threat modeling, S05 planning, S06 generation), và chặng nào do Tool đo lường (S07 execution).
-  - **Chiến lược Model Tiering 3 cấp (Tiết kiệm 65–75% chi phí token)**:
-    - `Claude Haiku 4.5`: Xử lý template, trích xuất JSON thô, tác vụ lặp lại.
-    - `Claude Sonnet 5`: Lập kế hoạch kiểm thử (S05) và sinh kịch bản candidate chi tiết (S06).
+  - **Chiến lược Dual-Model Tiering 2 cấp (Hợp nhất Sonnet 5 + Opus 5, Loại bỏ Haiku 4.5 theo DEF-X-M03 / M-02)**:
+    - `Claude Sonnet 5`: Đảm nhiệm toàn bộ việc xử lý template, trích xuất JSON, lập kế hoạch kiểm thử (S05) và sinh kịch bản candidate chi tiết (S06) với vai trò model chủ lực mặc định.
     - `Claude Opus 5`: Chỉ kích hoạt khi `Risk Tier == CRITICAL` tại S04 để phân tích Threat Modeling và lỗ hổng logic nghiệp vụ tinh vi.
+    - *Ghi chú chuẩn hóa*: Loại bỏ hoàn toàn Claude Haiku 4.5 khỏi kiến trúc nhằm đơn giản hóa điều phối, tránh rủi ro vỡ schema JSON và thống nhất chất lượng sinh test theo quyết định DEF-X-M03 / M-02.
   - **Giao thức ToolIntent Handshake an toàn (Law 10.1 & 13)**:
     - Model chỉ phát `ToolIntent JSON` với các tham số biểu tượng (Symbolic Params).
     - Job Controller chặn lại, kiểm tra Allowlist, tra cứu `TenantBinding` bí mật, cấp STS token ngắn hạn rồi mới dispatch trực tiếp sang Sandbox.
@@ -163,7 +163,7 @@ flowchart TB
     %% ========================================================
     %% ACCOUNT A: BACKEND & WORKFLOW AUTHORITY (ap-southeast-1)
     %% ========================================================
-    subgraph ACC_A["ACCOUNT A — BACKEND & WORKFLOW AUTHORITY (ap-southeast-1) [OBSERVED]"]
+    subgraph ACC_A["ACCOUNT A — BACKEND & WORKFLOW AUTHORITY (ap-southeast-1) [CANDIDATE]"]
         CF["AWS CloudFront CDN\n(/v1/*, /v2/* Routes)"]
         API["TI API v2 (FastAPI Engine)\n• Xác thực Entra ID / GitHub OIDC\n• Validate Schema & SHA-256 Digest\n• Trả mã 202 Accepted + job_id"]
         
@@ -182,19 +182,18 @@ flowchart TB
     %% ========================================================
     %% ACCOUNT B: AGENTCORE AI RUNTIME (us-east-1)
     %% ========================================================
-    subgraph ACC_B["ACCOUNT B — AGENTCORE RUNTIME & AI REASONING (us-east-1) [OBSERVED]"]
+    subgraph ACC_B["ACCOUNT B — AGENTCORE RUNTIME & AI REASONING (us-east-1) [CANDIDATE]"]
         direction TB
         HAR["TI Harness / TIJobRunner\n• Vòng lặp suy luận có giới hạn token\n• KHÔNG phải system of record"]
         
-        subgraph TIER["Bedrock Model Tiering Engine (Task 3)"]
-            M_HAIKU["Claude Haiku 4.5\n(Template & Parse JSON)"]
-            M_SONNET["Claude Sonnet 5\n(Planning S05 & Candidate S06)"]
+        subgraph TIER["Bedrock Dual-Model Tiering Engine (Task 3 — Sonnet 5 & Opus 5)"]
+            M_SONNET["Claude Sonnet 5\n(Planning S05, Candidate S06 & JSON Parsing)"]
             M_OPUS["Claude Opus 5\n(Threat Modeling when Risk == CRITICAL)"]
         end
 
         GATEWAY["AgentCore Gateway (MCP / IAM)\n• Chặn xuất ToolIntent không hợp lệ"]
         POLICY["Policy Engine\n• Giám sát ENFORCE rào chắn an ninh"]
-        MEM[("AgentCore Knowledge Memory\n(Chỉ lưu tri thức đã qua duyệt GOLDEN)")]
+        MEM[("AgentCore Knowledge Memory [UNVERIFIED]\n(Chỉ lưu tri thức đã qua duyệt GOLDEN · Chưa nghiệm thu)")]
     end
 
     %% ========================================================
@@ -205,13 +204,14 @@ flowchart TB
 
         subgraph NET_D9["Hạ Tầng Mạng An Ninh D9 (~$22/tháng)"]
             SG_DENY["Security Group: DENY ALL EGRESS\nPrivate Subnet (Không NAT, Không IGW)"]
-            VPCE["VPC Endpoints (AWS PrivateLink)\n• S3 Endpoint • ECR Endpoint • CloudWatch Logs"]
+            VPCE["VPC Endpoints (AWS PrivateLink)\n• S3 Endpoint • ECR Endpoint • CloudWatch Logs • STS"]
         end
 
         subgraph RUNNERS["Cụm Task Fargate Riêng Biệt (Interface: IsolatedRunner - Law 23)"]
             T_SAST["D5a SAST Task (W1)\n(Semgrep OSS + Trivy + Gitleaks)\nQuét PR Diff & Secret"]
+            T_API["D2 API Functional Task (W1)\n(Schemathesis + Playwright API)\nKiểm thử Hợp đồng & Fuzzing"]
             T_UI["D3 Web UI Task (W2)\n(Playwright Headless + axe-core)\nChạy E2E & Đo Accessibility"]
-            T_PERF["D4 Performance Task (W2)\n(AWS DLT + k6 Engine)\nBơm tải phân tán & Đo SLA p95"]
+            T_PERF["D4 Performance Task (W2)\n(AWS DLT + k6 Engine)\nBơm tải phân tán & Đo SLA p95\n⚠ Cần DevOps duyệt trước"]
             T_DB["D2.b Database Task (W1/W2)\n(Flyway + SQLAlchemy read-only)\nChạy trên Aurora Clone"]
             T_DAST["D5b DAST Task (W3)\n(OWASP ZAP / nuclei)\nQuét web Staging sống"]
         end
@@ -238,6 +238,7 @@ flowchart TB
     %% Job Controller tra cứu binding và dispatch ngang hàng
     LEASE --> RESOLVER
     RESOLVER -->|"6. Direct Dispatch có lease\n(Kèm short-lived STS credentials)"| T_SAST
+    RESOLVER -->|"6. Direct Dispatch có lease"| T_API
     RESOLVER -->|"6. Direct Dispatch có lease"| T_UI
     RESOLVER -->|"6. Direct Dispatch có lease"| T_PERF
     RESOLVER -->|"6. Direct Dispatch có lease"| T_DB
@@ -251,11 +252,11 @@ flowchart TB
     RUNNERS -.-> VPCE
 
     %% Ghi bằng chứng thô và cập nhật trạng thái
-    T_SAST & T_UI & T_PERF & T_DB & T_DAST -->|"7. Normalized Raw Evidence\n(Logs, traces, HAR, screenshots)"| S3_EVI
+    T_SAST & T_API & T_UI & T_PERF & T_DB & T_DAST -->|"7. Normalized Raw Evidence\n(Logs, traces, HAR, screenshots)"| S3_EVI
     S3_EVI -.->|"8. Báo cáo hoàn tất + SHA-256 Hash"| STATE
 
     %% Cập nhật tri thức
-    S3_EVI -.->|"9. Review GOLDEN (S10)"| MEM
+    S3_EVI -.->|"9. Review GOLDEN (S10 - UNVERIFIED)"| MEM
 
     %% Polling kết quả
     CI & PRT & CLI -.->|"10. Poll GET /v2/artifact-jobs/{id}\n(completed != PASS - Law 18)"| CF
@@ -298,6 +299,7 @@ flowchart TD
 
     subgraph PEER_WORKERS["4. Cụm Worker Ngang Hàng (Fargate Task-per-Job)"]
         W_SAST["Fargate Task: Semgrep SAST"]
+        W_API["Fargate Task: Schemathesis / Playwright API"]
         W_UI["Fargate Task: Playwright UI"]
         W_PERF["Fargate Task: k6 Load Test"]
         W_DB["Fargate Task: Flyway DB Clone"]
@@ -313,8 +315,8 @@ flowchart TD
     end
 
     STEP_CTRL --> TB_MAP
-    DIRECT_CALL --> W_SAST & W_UI & W_PERF & W_DB & W_DAST
-    W_SAST & W_UI & W_PERF & W_DB & W_DAST --> COL_RAW
+    DIRECT_CALL --> W_SAST & W_API & W_UI & W_PERF & W_DB & W_DAST
+    W_SAST & W_API & W_UI & W_PERF & W_DB & W_DAST --> COL_RAW
     REVOKE --> TERM_CTRL
 ```
 
@@ -341,38 +343,38 @@ sequenceDiagram
     JC->>DB: Ghi trạng thái QUEUED
     API-->>Caller: 202 Accepted {job_id, poll_url}
 
-    Note over JC,Harness: Chặng Phân Tích & Sinh Kịch Bản (S01 - S06)
+    Note over JC,Harness: Chặng Phân Tích Ngữ Nghĩa & Sinh Kịch Bản (S01 - S06)
     JC->>Harness: InvokeHarness (Artifact context, Token Budget)
-    Harness->>Harness: S03 Impact & S04 Risk Tiering (Opus 5 if Critical)
-    Harness->>Harness: S05 Planning & S06 Candidate Gen (Sonnet 5)
+    Harness->>Harness: S05 Planning & S06 Candidate Gen (Sonnet 5, Opus 5 nếu Threat Critical)
     Harness-->>JC: Trả ToolIntent JSON (Symbolic IDs, KHÔNG credentials)
+    JC->>JC: S03 Impact Engine & S04 Risk Engine (State Authority tính toán Target Runners)
 
     Note over JC,Fargate: Chặng Thực Thi Cô Lập (S07 Orchestration)
     JC->>JC: Tra cứu TenantBinding & STS cấp Token tạm
     JC->>DB: Cập nhật Step State: RUNNING (Lease TTL 5 mins)
     JC->>Fargate: ECS RunTask (Launch Fargate Task theo domain tương ứng)
     
-    loop Heartbeat
+    loop Heartbeat (chu kỳ 60s, Worker Lease TTL 5m)
         Fargate-->>JC: Gửi Heartbeat gia hạn lease
     end
 
-    Fargate->>Fargate: Thực thi kiểm thử trong môi trường NO-INTERNET
+    Fargate->>Fargate: Thực thi trong Private Subnet (SG Deny All, VPC Endpoints)
     Fargate->>S3: Ghi Raw Result (Logs, traces, screenshots)
     Fargate-->>JC: Báo hoàn tất tác vụ (Task Finished + S3 Key)
     
-    Note over JC,S3: Chặng Đóng Bằng Chứng & Phán Quyết Gate (S08 - S09)
-    JC->>S3: Băm SHA-256 digest & Khóa Object Lock
-    JC->>JC: Tính toán Gate Recommendation S09 (Deterministic Code Barrier)
-    JC->>DB: Cập nhật Job State: COMPLETED (kèm Gate Recommendation)
+    Note over JC,S3: Chặng Đóng Bằng Chứng & Phán Quyết Gate S09 (S08 - S09)
+    JC->>S3: Băm SHA-256 digest & Khóa Object Lock (WORM 90 ngày)
+    JC->>JC: S09 Deterministic Code Barrier (Critical==0, Secrets==0, Faithfulness>=0.85 +-0.03)
+    JC->>DB: Cập nhật Job State: COMPLETED & Gate Result: PASS / HOLD / DO_NOT_PASS (Law 18)
     
     loop Polling
         Caller->>API: GET /v2/artifact-jobs/{job_id}
-        API-->>Caller: 200 OK {state: COMPLETED, gate: HOLD / PASS / DO_NOT_PASS}
+        API-->>Caller: 200 OK {state: COMPLETED, gate_result: HOLD / PASS / DO_NOT_PASS}
     end
 
-    opt Nếu trạng thái là HOLD (có lỗ hổng High hoặc cần phê duyệt)
+    opt Nếu Gate Result là HOLD (Khuyến nghị chờ duyệt ngoại lệ - KHÔNG tự động pass)
         QA->>API: POST /v2/operations/{id}/actions (Submit Approved Waiver)
-        API->>DB: Cập nhật Final Release Decision: PASS
+        API->>DB: Cập nhật Final Release Decision: PASS (Đủ điều kiện Deploy)
     end
 ```
 
@@ -392,21 +394,26 @@ sequenceDiagram
   2. Fargate Task chạy **Flyway** để test migration kịch bản mới trên bản clone.
   3. Fargate Task chạy script **SQLAlchemy** (read-only) kiểm tra cấu trúc schema và ràng buộc toàn vẹn.
   4. Sau khi test xong, hủy bản Aurora Clone lập tức $\rightarrow$ Không ảnh hưởng đến dữ liệu production, chi phí chỉ tính trong vài phút tồn tại của clone.
+- ⚠️ **Lưu ý Vận hành & Quota:** Trạng thái phương án Aurora Clone là `CANDIDATE (PENDING tham vấn Team Data về quota snapshot và tần suất dọn dẹp clone)` theo Báo cáo Đối soát P3.
 
 ### 4.3. Domain D5a & D5b: Chiến lược An ninh Đa tầng (Hybrid Defense)
 Khắc phục sự lệch pha giữa SAST (quét code) và DAST (quét web sống):
 - **Tầng 1 — D5a SAST / SCA / Secret Scanner (Wave 1 — PR-time)**:
   - Công cụ: **Semgrep OSS** (quét SAST), **Trivy** (quét lỗ hổng thư viện phụ thuộc), **Gitleaks** (quét lộ mật khẩu/API key).
   - Vị trí: Chạy ngay khi lập trình viên mở PR (không cần ứng dụng phải deploy).
-- **Tầng 2 — AWS Native Inspection (Wave 1 & W2)**:
-  - **Amazon CodeGuru Security**: Phân tích AST diff của PR bằng Machine Learning.
-  - **Amazon Inspector**: Tự động rà quét ECR container image trước khi chạy.
+- **Tầng 2 — Base & Native Inspection (Wave 1 & W2)**:
+  - **Amazon Inspector**: Tự động rà quét lỗ hổng ECR container image trước khi chạy task.
+  - **Pre-scan S02→S04**: Semgrep OSS (ruleset rút gọn) kết hợp Gitleaks chạy pre-scan AST diff và secret để cung cấp input cho S03/S04. *(Lưu ý: Amazon CodeGuru Security đã chính thức EOL ngừng hoạt động từ 20/11/2025 theo GLOSSARY_TI và Báo cáo Đối soát §3.1 — KHÔNG dùng trong TI).*
 - **Tầng 3 — D5b DAST Runner (Wave 3 — Runtime Scanning)**:
   - Công cụ: **OWASP ZAP** / **nuclei** chạy trong Fargate sandbox.
   - Điều kiện kích hoạt: **Chỉ chạy khi có Staging URL sống** do tenant cung cấp.
 - **Tầng 4 — AI Threat Modeling (Chỉ kích hoạt khi Cần thiết)**:
   - Khi Tầng 1 hoặc Tầng 2 phát hiện lỗ hổng `CRITICAL`, hệ thống tự động gán `Risk Tier: CRITICAL`.
   - Lúc này, **Claude Opus 5** được huy động để phân tích logic nghiệp vụ sâu (IDOR, race conditions, phân quyền bypass). Nếu không có lỗ hổng Critical, Opus 5 sẽ không được gọi $\rightarrow$ Tiết kiệm ngân sách token tối đa.
+
+> 📝 **Ghi chú Kỹ thuật & Rào chắn (Footnote Gap - Checklist F09):**
+> 1. *Phạm vi quét SAST/SCA:* Semgrep/Trivy ở giai đoạn này chủ yếu quét mã nguồn ứng dụng (source code), chưa quét toàn diện các tệp kiểm thử động (testing artifacts). Đây là gap đã được ghi nhận tại Biên bản 23/09 §3 và sẽ được mở rộng ở Wave 2.
+> 2. *Rủi ro Prompt Injection:* Trong kiến trúc TI không có UI Chat người dùng cuối trực tiếp; rủi ro Prompt Injection được quản lý theo góc độ phát hiện payload độc hại lọt vào source code / PR diff qua rào chắn allowlist và AgentCore Gateway.
 
 ### 4.4. Domain D9: Tối ưu Hóa Chi phí Mạng Egress Sandbox
 - **Nguyên tắc**: Tuyệt đối không cho phép container đang chạy test kết nối ra Internet để phòng chống rò rỉ mã nguồn và dữ liệu tenant.
@@ -417,7 +424,27 @@ Khắc phục sự lệch pha giữa SAST (quét code) và DAST (quét web sốn
     - *com.amazonaws.ap-southeast-1.s3* (Gateway Endpoint — Miễn phí).
     - *com.amazonaws.ap-southeast-1.ecr.api* & *ecr.dkr* (Interface Endpoints).
     - *com.amazonaws.ap-southeast-1.logs* (CloudWatch Logs Interface Endpoint).
+    - *com.amazonaws.ap-southeast-1.sts* (AWS STS Interface Endpoint cho short-lived tokens).
 - **Hiệu quả kinh tế**: Giảm chi phí mạng từ **$288/tháng** (AWS Network Firewall) xuống còn **~$22/tháng** (3 VPC interface endpoints $\times$ $7.3/tháng).
+
+### 4.5. Domain D4: Performance & Load Testing với Distributed k6 Engine
+- **Bộ 3 khóa an toàn (3 Safety Interlocks)**:
+  1. *Ngưỡng trần tải (VU Ceiling)*: Giới hạn tối đa 500 Virtual Users trong môi trường Staging.
+  2. *Circuit Breaker*: Tự động ngắt bài test khi tỷ lệ lỗi HTTP 5xx vượt quá 5% hoặc latency p95 > 2.000ms.
+  3. *Tự hủy có giám sát*: Task Fargate tự động hủy khi hết thời gian chạy tối đa (timeout 15 phút).
+- ⚠️ **Cảnh báo Rủi ro Hạ tầng & Quy định Phê duyệt (Biên bản 23/09 §3 / Checklist B10, F08)**:
+  > **CẢNH BÁO:** Việc bơm tải lớn có nguy cơ làm cạn kiệt tài nguyên hệ thống (tự DoS dịch vụ nội bộ) hoặc bị AWS phòng vệ kích hoạt ban IP / rate-limit tài khoản AWS.  
+  > **RÀO CHẮN BẮT BUỘC:** Mọi bài test tải D4 chỉ được phép thực thi trong dải IP/VPC được chỉ định và **bắt buộc phải có phê duyệt trước từ DevOps Team** thông qua TenantBinding Allowlist.
+
+### 4.6. Quản Lý Kịch Bản Kiểm Thử & Lịch Sử Nền Tảng
+- **Kho lưu trữ kịch bản (Test Scripts Repository - Checklist F07)**:
+  - Toàn bộ kịch bản kiểm thử (Playwright E2E, k6 scripts, Flyway migrations) được quản lý tập trung tại kho mã nguồn `ti-test-packs/` (Đề xuất — `CANDIDATE`).
+  - Phân phiên bản chặt chẽ theo **Git Tag** (ví dụ: `v1.2.0-crm-smoke`) gắn kèm digest băm SHA-256 đối soát.
+- **Image Container Tiền Đóng Gói (Pre-baked ECR Images - Checklist D04)**:
+  - 4 container images chuẩn hóa được đóng gói sẵn và quét an ninh trên Amazon ECR: `ti-runner-sast`, `ti-runner-api`, `ti-runner-browser`, `ti-runner-perf`.
+  - Quy trình giao hàng: `GitHub Actions → Amazon ECR → AWS SSM RunCommand/ECS` (Đường khai báo nét đứt, chưa đo).
+- **Mốc Lịch Sử AgentCore Harness (Checklist A10, D08)**:
+  - `AgentCore Runtime 18` — Xác nhận triển khai qua receipt ngày 14/09/2026 (source `fbdd8dfc`, container image `efabf57dcd8c`) làm mốc tham chiếu lịch sử kiến trúc nền tảng.
 
 ---
 
@@ -474,10 +501,10 @@ Bảng phân tích chi phí dựa trên đơn giá chính thức của AWS (vớ
 | :--- | :--- | :--- | :--- | :--- |
 | **Compute Sandbox** | Chạy EC2 liên tục ($80/tháng) | **ECS Fargate task-per-job** (2 vCPU, 4GB RAM) | ~$5.00 – $15.00 | `INFERRED` (Đơn giá chính thức AWS Fargate) |
 | **Bảo mật Mạng Egress** | AWS Network Firewall | **Private Subnet + SG Deny All + VPC Endpoints** | ~$22.00 | `CANDIDATE` (7.3$/endpoint/AZ) |
-| **Job Store Database** | SQLite DEV | **Amazon RDS PostgreSQL (db.t4g.micro)** | ~$15.00 – $25.00 | `OBSERVED` |
-| **Lưu trữ Bằng chứng** | S3 Standard không khóa | **S3 Standard + Object Lock (Compliance Mode)** | ~$3.00 – $5.00 | `OBSERVED` |
+| **Job Store Database** | SQLite DEV | **Amazon RDS PostgreSQL (db.t4g.micro)** | ~$15.00 – $25.00 | `CANDIDATE` (Hiện trạng đo 22/09: SQLite trên 1 EC2 ghim 8a61cf66) |
+| **Lưu trữ Bằng chứng** | S3 Standard không khóa | **S3 Standard + Object Lock (Compliance Mode)** | ~$3.00 – $5.00 | `CANDIDATE` (Hiện trạng đo 22/09: lưu ổ EBS trên EC2) |
 | **Database Testing** | Testcontainers trên EC2 (tăng cấu hình) | **Aurora Serverless v2 Clone** (chỉ tính theo phút) | ~$10.00 – $20.00 | `CANDIDATE` |
-| **Chi phí AI Token** | Toàn bộ bằng Claude Opus 5 ($15/1M token) | **Claude Model Tiering (Haiku/Sonnet/Opus)** | Giảm từ $120 $\rightarrow$ ~$35.00 | `INFERRED` (Tối ưu 65–75% chi phí token) |
+| **Chi phí AI Token** | Toàn bộ bằng Claude Opus 5 ($15/1M token) | **Claude Dual-Model Tiering (Sonnet 5 / Opus 5)** | Giảm từ $120 $\rightarrow$ ~$35.00 | `INFERRED` (Tối ưu 65–75% chi phí token, bỏ Haiku 4.5 theo M-02) |
 | **TỔNG CỘNG HẠ TẦNG** | **~$450 – $600 / tháng** | **TIẾT KIỆM TỐI ĐA** | **~$90.00 – $122.00 / tháng** | Tiết kiệm ~75% ngân sách |
 
 ---

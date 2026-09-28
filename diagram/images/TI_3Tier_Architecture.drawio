@@ -7,7 +7,7 @@
         <mxCell id="1" parent="0" />
 
         <!-- Header Title Banner -->
-        <mxCell id="header" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;MÔ HÌNH HỢP NHẤT 3 TẦNG KIẾN TRÚC TESTING INTELLIGENCE (TI)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px; opacity: 0.9;&quot;&gt;Master Architecture Blueprint — Não bộ AI (Task 3&amp;amp;4) · Hồn Điều Phối Ports &amp;amp; Adapters (DevOps) · Xác Hạ Tầng Điện Toán Cô Lập (Task 1&amp;amp;2)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#1a237e;strokeColor=#0d47a1;fontColor=#ffffff;align=center;verticalAlign=middle;arcSize=6;" vertex="1" parent="1">
+        <mxCell id="header" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;MÔ HÌNH HỢP NHẤT 3 TẦNG KIẾN TRÚC TESTING INTELLIGENCE (TI) [CANDIDATE]&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px; opacity: 0.9;&quot;&gt;Master Architecture Blueprint — Não bộ AI (Task 3&amp;amp;4) · Hồn Điều Phối Ports &amp;amp; Adapters (DevOps) · Xác Hạ Tầng Điện Toán Cô Lập (Task 1&amp;amp;2)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#1a237e;strokeColor=#0d47a1;fontColor=#ffffff;align=center;verticalAlign=middle;arcSize=6;" vertex="1" parent="1">
           <mxGeometry x="40" y="20" width="1100" height="55" as="geometry" />
         </mxCell>
 
@@ -16,7 +16,7 @@
           <mxGeometry x="40" y="95" width="1100" height="150" as="geometry" />
         </mxCell>
 
-        <mxCell id="tier1_c1" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Bedrock Model Tiering (Task 3)&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 12px; line-height: 1.4;&quot;&gt;• &lt;b&gt;Haiku 4.5&lt;/b&gt;: Template &amp;amp; Parse JSON thô&lt;br&gt;• &lt;b&gt;Sonnet 5&lt;/b&gt;: Lập kế hoạch S05 &amp;amp; Sinh test S06&lt;br&gt;• &lt;b&gt;Opus 5&lt;/b&gt;: S04 Threat Modeling (khi Risk CRITICAL)&lt;br&gt;&lt;span style=&quot;color: #2e7d32; font-weight: bold;&quot;&gt;➔ Tiết kiệm 65–75% chi phí token&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#ba68c8;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;" vertex="1" parent="tier1_box">
+        <mxCell id="tier1_c1" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Bedrock Dual-Model Tiering (Task 3)&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 12px; line-height: 1.4;&quot;&gt;• &lt;b&gt;Sonnet 5&lt;/b&gt;: S05 Planning, S06 Gen &amp;amp; Parse JSON&lt;br&gt;• &lt;b&gt;Opus 5&lt;/b&gt;: S04 Threat Modeling (khi Risk CRITICAL)&lt;br&gt;• &lt;i style=&quot;color: #757575;&quot;&gt;Bỏ Haiku 4.5 theo quyết định DEF-X-M03 / M-02&lt;/i&gt;&lt;br&gt;&lt;span style=&quot;color: #2e7d32; font-weight: bold;&quot;&gt;➔ Dual-Model Tiering: Tối ưu 65–75% token&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#ba68c8;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;" vertex="1" parent="tier1_box">
           <mxGeometry x="20" y="42" width="335" height="96" as="geometry" />
         </mxCell>
 
@@ -24,7 +24,7 @@
           <mxGeometry x="380" y="42" width="340" height="96" as="geometry" />
         </mxCell>
 
-        <mxCell id="tier1_c3" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Khung Đo Lường ISTQB CT-AI / GenAI&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 12px; line-height: 1.4;&quot;&gt;• &lt;b&gt;Law 5 &amp;amp; 7&lt;/b&gt;: Đo bằng tool thật · Zero Self-Declaration&lt;br&gt;• &lt;b&gt;Bedrock Evals&lt;/b&gt;: Groundedness &amp;ge; 0.80, Faithfulness &amp;ge; 0.85&lt;br&gt;• Temperature: 0.0 (Greedy Decoding ±0.03)&lt;br&gt;&lt;span style=&quot;color: #1565c0; font-weight: bold;&quot;&gt;➔ Loại bỏ 100% kịch bản ảo giác&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#ba68c8;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;" vertex="1" parent="tier1_box">
+        <mxCell id="tier1_c3" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Khung Đo Lường ISTQB CT-AI / GenAI&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 12px; line-height: 1.4;&quot;&gt;• &lt;b&gt;Law 5 &amp;amp; 7&lt;/b&gt;: Đo bằng tool thật · Zero Self-Declaration&lt;br&gt;• &lt;b&gt;Bedrock Evals&lt;/b&gt;: Groundedness &amp;ge; 0.80, Faithfulness &amp;ge; 0.85&lt;br&gt;• Temperature: 0.0 (Greedy Decoding ±0.03)&lt;br&gt;&lt;span style=&quot;color: #1565c0; font-weight: bold;&quot;&gt;➔ Kiểm soát chặt chẽ rủi ro ảo giác&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#ba68c8;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;" vertex="1" parent="tier1_box">
           <mxGeometry x="745" y="42" width="335" height="96" as="geometry" />
         </mxCell>
 
@@ -72,7 +72,7 @@
           <mxGeometry x="560" y="42" width="260" height="96" as="geometry" />
         </mxCell>
 
-        <mxCell id="tier3_c4" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Aurora Serverless v2 Clone&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 11.5px; line-height: 1.4;&quot;&gt;• Domain D2.b: Snapshot &amp;lt; 60 giây&lt;br&gt;• Test Flyway &amp;amp; SQLAlchemy schema&lt;br&gt;• Hủy ngay sau test (~$10/tháng)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;" vertex="1" parent="tier3_box">
+        <mxCell id="tier3_c4" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Aurora Serverless v2 Clone&lt;/b&gt;&lt;hr style=&quot;margin: 4px 0;&quot;&gt;&lt;span style=&quot;font-size: 11.5px; line-height: 1.4;&quot;&gt;• Domain D2.b: Snapshot &amp;lt; 60 giây&lt;br&gt;• Test Flyway &amp;amp; SQLAlchemy schema&lt;br&gt;• Hủy sau test &lt;b style=&quot;color: #d32f2f;&quot;&gt;(PENDING tham vấn Data)&lt;/b&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#a5d6a7;fontColor=#212121;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;" vertex="1" parent="tier3_box">
           <mxGeometry x="840" y="42" width="240" height="96" as="geometry" />
         </mxCell>
 

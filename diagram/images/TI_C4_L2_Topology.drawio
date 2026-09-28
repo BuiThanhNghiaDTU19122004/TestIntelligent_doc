@@ -33,7 +33,7 @@
         <!-- ======================================================== -->
         <!-- ZONE 2: ACCOUNT A - SINGAPORE (BACKEND & WORKFLOW AUTHORITY) -->
         <!-- ======================================================== -->
-        <mxCell id="zone_acc_a" value="&lt;b style=&quot;font-size: 15px;&quot;&gt;ACCOUNT A — BACKEND &amp;amp; WORKFLOW AUTHORITY (ap-southeast-1) [OBSERVED]&lt;/b&gt;" style="swimlane;startSize=32;fillColor=#e8eaf6;strokeColor=#3f51b5;strokeWidth=2;fontColor=#1a237e;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="1">
+        <mxCell id="zone_acc_a" value="&lt;b style=&quot;font-size: 15px;&quot;&gt;ACCOUNT A — BACKEND &amp;amp; WORKFLOW AUTHORITY (ap-southeast-1) [CANDIDATE]&lt;/b&gt;" style="swimlane;startSize=32;fillColor=#e8eaf6;strokeColor=#3f51b5;strokeWidth=2;fontColor=#1a237e;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="1">
           <mxGeometry x="40" y="305" width="490" height="615" as="geometry" />
         </mxCell>
 
@@ -82,7 +82,7 @@
         <!-- ======================================================== -->
         <!-- ZONE 3: ACCOUNT B - N. VIRGINIA (AGENTCORE RUNTIME & AI) -->
         <!-- ======================================================== -->
-        <mxCell id="zone_acc_b" value="&lt;b style=&quot;font-size: 15px;&quot;&gt;ACCOUNT B — AGENTCORE RUNTIME &amp;amp; AI REASONING (us-east-1) [OBSERVED]&lt;/b&gt;" style="swimlane;startSize=32;fillColor=#f3e5f5;strokeColor=#7b1fa2;strokeWidth=2;fontColor=#4a148c;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="1">
+        <mxCell id="zone_acc_b" value="&lt;b style=&quot;font-size: 15px;&quot;&gt;ACCOUNT B — AGENTCORE RUNTIME &amp;amp; AI REASONING (us-east-1) [CANDIDATE]&lt;/b&gt;" style="swimlane;startSize=32;fillColor=#f3e5f5;strokeColor=#7b1fa2;strokeWidth=2;fontColor=#4a148c;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="1">
           <mxGeometry x="570" y="95" width="1350" height="240" as="geometry" />
         </mxCell>
 
@@ -91,27 +91,23 @@
         </mxCell>
 
         <!-- Subgraph Model Tiering -->
-        <mxCell id="tier_box" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Bedrock Model Tiering Engine (Tối ưu 65–75% Chi Phí Token)&lt;/b&gt;" style="swimlane;startSize=26;fillColor=#ede7f6;strokeColor=#512da8;strokeWidth=1.5;fontColor=#311b92;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="zone_acc_b">
+        <mxCell id="tier_box" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Bedrock Dual-Model Tiering Engine (Tối ưu 65–75% Token — Bỏ Haiku 4.5)&lt;/b&gt;" style="swimlane;startSize=26;fillColor=#ede7f6;strokeColor=#512da8;strokeWidth=1.5;fontColor=#311b92;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="zone_acc_b">
           <mxGeometry x="290" y="42" width="675" height="135" as="geometry" />
         </mxCell>
 
-        <mxCell id="m_haiku" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Claude Haiku 4.5&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Parse thô &amp;amp; JSON artifacts&lt;br&gt;• Chi phí siêu rẻ&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#b39ddb;fontColor=#311b92;align=left;spacingLeft=8;" vertex="1" parent="tier_box">
-          <mxGeometry x="15" y="34" width="200" height="85" as="geometry" />
+        <mxCell id="m_sonnet" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Claude Sonnet 5&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Model chủ lực mặc định (Primary)&lt;br&gt;• Test Planning S05 &amp;amp; Candidate Gen S06&lt;br&gt;• Template parsing &amp;amp; JSON extraction&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#b39ddb;fontColor=#311b92;align=left;spacingLeft=8;" vertex="1" parent="tier_box">
+          <mxGeometry x="25" y="34" width="300" height="85" as="geometry" />
         </mxCell>
 
-        <mxCell id="m_sonnet" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Claude Sonnet 5&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Test Planning S05&lt;br&gt;• Candidate Gen S06 (AST diff)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#b39ddb;fontColor=#311b92;align=left;spacingLeft=8;" vertex="1" parent="tier_box">
-          <mxGeometry x="230" y="34" width="215" height="85" as="geometry" />
-        </mxCell>
-
-        <mxCell id="m_opus" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Claude Opus 5&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #b71c1c;&quot;&gt;&lt;b&gt;S04: Risk == CRITICAL&lt;/b&gt;&lt;br&gt;Threat Modeling sâu&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffebee;strokeColor=#e57373;fontColor=#b71c1c;align=left;spacingLeft=8;" vertex="1" parent="tier_box">
-          <mxGeometry x="460" y="34" width="200" height="85" as="geometry" />
+        <mxCell id="m_opus" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Claude Opus 5&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #b71c1c;&quot;&gt;&lt;b&gt;S04: Khi Risk == CRITICAL&lt;/b&gt;&lt;br&gt;• Threat Modeling &amp;amp; Lỗ hổng sâu&lt;br&gt;• Phân tích rủi ro an ninh đặc thù&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffebee;strokeColor=#e57373;fontColor=#b71c1c;align=left;spacingLeft=8;" vertex="1" parent="tier_box">
+          <mxGeometry x="350" y="34" width="300" height="85" as="geometry" />
         </mxCell>
 
         <mxCell id="policy_node" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Policy Engine &amp;amp; Guardrails&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Enforce rào chắn an ninh&lt;br&gt;• Bedrock Evals Groundedness &amp;ge; 0.80&lt;br&gt;• Faithfulness &amp;ge; 0.85&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#ba68c8;fontColor=#4a148c;align=left;spacingLeft=10;" vertex="1" parent="zone_acc_b">
           <mxGeometry x="985" y="42" width="340" height="75" as="geometry" />
         </mxCell>
 
-        <mxCell id="mem_node" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;AgentCore Memory (S10)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;Chỉ lưu tri thức đã qua thẩm định GOLDEN&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#ede7f6;strokeColor=#7b1fa2;fontColor=#4a148c;" vertex="1" parent="zone_acc_b">
+        <mxCell id="mem_node" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;AgentCore Memory (S10) [UNVERIFIED]&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px;&quot;&gt;Chỉ lưu tri thức đã qua duyệt GOLDEN · Chưa nghiệm thu&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#ede7f6;strokeColor=#7b1fa2;fontColor=#4a148c;" vertex="1" parent="zone_acc_b">
           <mxGeometry x="985" y="125" width="340" height="52" as="geometry" />
         </mxCell>
 
@@ -135,37 +131,41 @@
           <mxGeometry x="15" y="30" width="620" height="32" as="geometry" />
         </mxCell>
 
-        <mxCell id="vpce_node" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;VPC Endpoints (AWS PrivateLink)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;S3 Gateway ($0 Miễn phí) · ECR dkr/api · CloudWatch Logs · AWS STS&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#aed581;fontColor=#33691e;" vertex="1" parent="net_d9_box">
+        <mxCell id="vpce_node" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;VPC Endpoints &amp;amp; Amazon ECR (PrivateLink)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;S3 Gateway ($0) · ECR (4 image pre-baked + digest) · Logs · STS Token&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffffff;strokeColor=#aed581;fontColor=#33691e;" vertex="1" parent="net_d9_box">
           <mxGeometry x="660" y="30" width="625" height="32" as="geometry" />
         </mxCell>
 
-        <!-- Subgraph Runners -->
-        <mxCell id="runners_box" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Cụm Task Fargate Riêng Biệt (Cơ chế Adapter qua Interface: IsolatedRunner - Law 23)&lt;/b&gt;" style="swimlane;startSize=26;fillColor=#ffffff;strokeColor=#4caf50;strokeWidth=1.5;fontColor=#1b5e20;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="zone_sandbox">
+        <!-- Subgraph Runners (6 Trục Chuẩn Hóa) -->
+        <mxCell id="runners_box" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Cụm Task Fargate Riêng Biệt (Cơ chế Adapter qua Interface: IsolatedRunner - Law 23) — 6 TRỤC KIỂM THỬ&lt;/b&gt;" style="swimlane;startSize=26;fillColor=#ffffff;strokeColor=#4caf50;strokeWidth=1.5;fontColor=#1b5e20;fontFamily=Segoe UI, Arial, sans-serif;rounded=1;arcSize=6;collapsible=0;" vertex="1" parent="zone_sandbox">
           <mxGeometry x="25" y="116" width="1300" height="150" as="geometry" />
         </mxCell>
 
-        <mxCell id="t_sast" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;D5a SAST Task (W1)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11.5px; color: #555;&quot;&gt;Semgrep, Trivy, Gitleaks&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Quét AST Git diff 2–5s&lt;br&gt;• Xuất SARIF thô PR-time&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#f9fbe7;strokeColor=#c0ca33;fontColor=#827717;align=left;spacingLeft=8;" vertex="1" parent="runners_box">
-          <mxGeometry x="15" y="34" width="240" height="102" as="geometry" />
+        <mxCell id="t_sast" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D5a SAST Task (W1)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;Semgrep, Trivy, Gitleaks&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• Quét AST diff &amp;amp; Secret&lt;br&gt;• Xuất SARIF thô PR-time&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#f9fbe7;strokeColor=#c0ca33;fontColor=#827717;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="15" y="34" width="200" height="102" as="geometry" />
         </mxCell>
 
-        <mxCell id="t_ui" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;D3 Web UI Task (W2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11.5px; color: #555;&quot;&gt;Playwright, Chromium, axe&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Chạy E2E Browser flows&lt;br&gt;• WCAG 2.1 AA · Video &amp;amp; trace&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#e0f7fa;strokeColor=#00acc1;fontColor=#006064;align=left;spacingLeft=8;" vertex="1" parent="runners_box">
-          <mxGeometry x="270" y="34" width="240" height="102" as="geometry" />
+        <mxCell id="t_api" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D2 API Task (W1)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;Schemathesis, Playwright API&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• Contract test &amp;amp; Fuzzing&lt;br&gt;• Đo SLA endpoint &amp;lt; 1s&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#e8eaf6;strokeColor=#3f51b5;fontColor=#1a237e;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="227" y="34" width="200" height="102" as="geometry" />
         </mxCell>
 
-        <mxCell id="t_perf" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;D4 Perf Task (W2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11.5px; color: #555;&quot;&gt;AWS DLT, k6 Engine&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Bơm tải phân tán ALB&lt;br&gt;• 3 Khóa An Toàn · Đo p95 SLA&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#fff3e0;strokeColor=#fb8c00;fontColor=#e65100;align=left;spacingLeft=8;" vertex="1" parent="runners_box">
-          <mxGeometry x="525" y="34" width="240" height="102" as="geometry" />
+        <mxCell id="t_ui" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D3 Web UI Task (W2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;Playwright, Chromium, axe&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• Chạy E2E Browser flows&lt;br&gt;• WCAG 2.1 AA · Video trace&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#e0f7fa;strokeColor=#00acc1;fontColor=#006064;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="439" y="34" width="200" height="102" as="geometry" />
         </mxCell>
 
-        <mxCell id="t_db" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;D2.b DB Task (W1/2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11.5px; color: #555;&quot;&gt;Flyway, SQLAlchemy&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Chạy trên Aurora Clone&lt;br&gt;• Schema verify &amp;amp; Rollback&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ede7f6;strokeColor=#8e24aa;fontColor=#4a148c;align=left;spacingLeft=8;" vertex="1" parent="runners_box">
-          <mxGeometry x="780" y="34" width="240" height="102" as="geometry" />
+        <mxCell id="t_perf" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D4 Perf Task (W2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;AWS DLT, k6 Engine&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• 3 Khóa An Toàn · Đo p95&lt;br&gt;&lt;b style=&quot;color: #d32f2f;&quot;&gt;⚠ Xin DevOps duyệt trước&lt;/b&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#fff3e0;strokeColor=#fb8c00;fontColor=#e65100;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="651" y="34" width="200" height="102" as="geometry" />
         </mxCell>
 
-        <mxCell id="t_dast" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;D5b DAST Task (W3)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11.5px; color: #555;&quot;&gt;OWASP ZAP, Nuclei&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 11px; color: #444;&quot;&gt;• Dynamic Fuzzing&lt;br&gt;• Chỉ chạy khi có Staging URL&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffebee;strokeColor=#e53935;fontColor=#b71c1c;align=left;spacingLeft=8;" vertex="1" parent="runners_box">
-          <mxGeometry x="1035" y="34" width="250" height="102" as="geometry" />
+        <mxCell id="t_db" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D2.b DB Task (W1/2)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;Flyway, SQLAlchemy&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• Chạy trên Aurora Clone&lt;br&gt;• Schema verify &amp;amp; Rollback&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ede7f6;strokeColor=#8e24aa;fontColor=#4a148c;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="863" y="34" width="200" height="102" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t_dast" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;D5b DAST Task (W3)&lt;/b&gt;&lt;br&gt;&lt;b style=&quot;font-size: 11px; color: #555;&quot;&gt;OWASP ZAP, Nuclei&lt;/b&gt;&lt;hr style=&quot;margin: 3px 0;&quot;&gt;&lt;span style=&quot;font-size: 10.5px; color: #444;&quot;&gt;• Dynamic Fuzzing&lt;br&gt;• &lt;b style=&quot;color: #b71c1c;&quot;&gt;Chỉ chạy khi có Staging URL&lt;/b&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#ffebee;strokeColor=#e53935;fontColor=#b71c1c;align=left;spacingLeft=6;" vertex="1" parent="runners_box">
+          <mxGeometry x="1075" y="34" width="210" height="102" as="geometry" />
         </mxCell>
 
         <!-- Aurora Clone Box -->
-        <mxCell id="aurora_clone" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Amazon Aurora Serverless v2 Clone (Domain D2.b)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;Copy-on-Write sạch &amp;lt; 60s từ Staging · Không tốn dung lượng snapshot · Tự hủy sau khi test (~$10–$20/th)&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#e8f5e9;strokeColor=#2e7d32;fontColor=#1b5e20;align=center;" vertex="1" parent="zone_sandbox">
+        <mxCell id="aurora_clone" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;Amazon Aurora Serverless v2 Clone (Domain D2.b)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;Copy-on-Write sạch &amp;lt; 60s từ Staging · Tự hủy sau khi test &lt;b style=&quot;color: #d32f2f;&quot;&gt;(PENDING tham vấn Team Data về quota snapshot)&lt;/b&gt;&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#e8f5e9;strokeColor=#2e7d32;fontColor=#1b5e20;align=center;" vertex="1" parent="zone_sandbox">
           <mxGeometry x="25" y="278" width="1300" height="52" as="geometry" />
         </mxCell>
 
@@ -278,7 +278,7 @@
         <!-- ======================================================== -->
         <!-- BOTTOM LEGEND BAR -->
         <!-- ======================================================== -->
-        <mxCell id="legend_bar" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;CHÚ THÍCH:&lt;/b&gt; &amp;nbsp;&lt;span style=&quot;background-color: #e8eaf6; padding: 2px 8px; border: 1px solid #3f51b5; font-size: 12px;&quot;&gt;Account A: ap-southeast-1 [OBSERVED]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #f3e5f5; padding: 2px 8px; border: 1px solid #7b1fa2; font-size: 12px;&quot;&gt;Account B: us-east-1 Bedrock AI [OBSERVED]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #e8f5e9; padding: 2px 8px; border: 1px solid #2e7d32; font-size: 12px;&quot;&gt;Sandbox VPC: Fargate Enclave [CANDIDATE]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #f5f5f5; padding: 2px 8px; border: 1px solid #616161; font-size: 12px;&quot;&gt;External Callers&lt;/span&gt;&amp;nbsp;&amp;nbsp;|&amp;nbsp;&amp;nbsp;&lt;b style=&quot;font-size: 12.5px;&quot;&gt;Luồng Dữ Liệu:&lt;/b&gt; Tuần tự từ &lt;b&gt;[1]&lt;/b&gt; đến &lt;b&gt;[10]&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12.5;fillColor=#eceff1;strokeColor=#90a4ae;fontColor=#37474f;align=center;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="legend_bar" value="&lt;b style=&quot;font-size: 13px;&quot;&gt;CHÚ THÍCH:&lt;/b&gt; &amp;nbsp;&lt;span style=&quot;background-color: #e8eaf6; padding: 2px 8px; border: 1px solid #3f51b5; font-size: 12px;&quot;&gt;Account A: ap-southeast-1 [CANDIDATE]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #f3e5f5; padding: 2px 8px; border: 1px solid #7b1fa2; font-size: 12px;&quot;&gt;Account B: us-east-1 Bedrock AI [CANDIDATE]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #e8f5e9; padding: 2px 8px; border: 1px solid #2e7d32; font-size: 12px;&quot;&gt;Sandbox VPC: Fargate Enclave [CANDIDATE]&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: #f5f5f5; padding: 2px 8px; border: 1px solid #616161; font-size: 12px;&quot;&gt;External Callers&lt;/span&gt;&amp;nbsp;&amp;nbsp;|&amp;nbsp;&amp;nbsp;&lt;b style=&quot;font-size: 12px;&quot;&gt;Quy ước Nét:&lt;/b&gt; Nét liền = OBSERVED (đã đo live 1 EC2) · Nét đứt = CANDIDATE (thiết kế đích / chưa đo) · Luồng: [1]➔[10]" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12.5;fillColor=#eceff1;strokeColor=#90a4ae;fontColor=#37474f;align=center;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="40" y="935" width="1880" height="42" as="geometry" />
         </mxCell>
 

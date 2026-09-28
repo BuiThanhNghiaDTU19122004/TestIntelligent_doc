@@ -109,8 +109,8 @@
           </mxGeometry>
         </mxCell>
 
-        <!-- 6. Harness self-loop S03 & S04 -->
-        <mxCell id="msg6" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;6. S03 Impact &amp;amp; S04 Risk Tiering&lt;/b&gt; (Opus 5 nếu Risk == CRITICAL)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <!-- 6. Harness self-loop S05 & S06 -->
+        <mxCell id="msg6" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;6. S05 Planning &amp;amp; S06 Candidate Gen&lt;/b&gt; (Sonnet 5; Opus 5 nếu Threat CRITICAL)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1095" y="415" as="sourcePoint" />
             <mxPoint x="1095" y="450" as="targetPoint" />
@@ -121,8 +121,8 @@
           </mxGeometry>
         </mxCell>
 
-        <!-- 7. Harness self-loop S05 & S06 -->
-        <mxCell id="msg7" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;7. S05 Planning &amp;amp; S06 Candidate Gen&lt;/b&gt; (Sonnet 5, Evals &amp;ge; 0.80)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <!-- 7. AgentCore Gateway Validation -->
+        <mxCell id="msg7" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;7. AgentCore Gateway &amp;amp; Policy Enforce&lt;/b&gt; (Chặn secret, Bedrock Evals &amp;ge; 0.80)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1095" y="475" as="sourcePoint" />
             <mxPoint x="1095" y="510" as="targetPoint" />
@@ -149,7 +149,7 @@
         </mxCell>
 
         <!-- 9. JC self-loop: TenantBinding & STS -->
-        <mxCell id="msg9" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;9. Resolve TenantBinding &amp;amp; cấp STS Short-lived Creds&lt;/b&gt; (Law 13)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <mxCell id="msg9" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;9. S03 Impact &amp;amp; S04 Risk Engine (JC Authority)&lt;/b&gt; · Resolve TenantBinding &amp;amp; STS Creds (Law 13)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="615" y="625" as="sourcePoint" />
             <mxPoint x="615" y="660" as="targetPoint" />
@@ -177,7 +177,7 @@
         </mxCell>
 
         <!-- Loop Heartbeat Frame -->
-        <mxCell id="loop_hb" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;loop&lt;/b&gt; &lt;span style=&quot;font-size: 11px;&quot;&gt;[Heartbeat định kỳ 60s]&lt;/span&gt;" style="shape=umlFrame;whiteSpace=wrap;html=1;width=180;height=20;fillColor=none;strokeColor=#4caf50;strokeWidth=1.5;fontColor=#2e7d32;fontFamily=Segoe UI, Arial, sans-serif;" vertex="1" parent="1">
+        <mxCell id="loop_hb" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;loop&lt;/b&gt; &lt;span style=&quot;font-size: 11px;&quot;&gt;[Heartbeat định kỳ 60s / Lease TTL 5m]&lt;/span&gt;" style="shape=umlFrame;whiteSpace=wrap;html=1;width=220;height=20;fillColor=none;strokeColor=#4caf50;strokeWidth=1.5;fontColor=#2e7d32;fontFamily=Segoe UI, Arial, sans-serif;" vertex="1" parent="1">
           <mxGeometry x="575" y="745" width="800" height="52" as="geometry" />
         </mxCell>
 
@@ -190,7 +190,7 @@
         </mxCell>
 
         <!-- 13. Fargate self-loop test execution -->
-        <mxCell id="msg13" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;13. Thực thi kiểm thử cô lập&lt;/b&gt; (Playwright/k6/Flyway/Semgrep - NO-INTERNET)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <mxCell id="msg13" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;13. Thực thi kiểm thử cô lập&lt;/b&gt; (Playwright/k6/Flyway/Semgrep - Private Subnet D9)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1335" y="820" as="sourcePoint" />
             <mxPoint x="1335" y="855" as="targetPoint" />
@@ -233,7 +233,7 @@
         </mxCell>
 
         <!-- 17. JC self-loop: S09 Deterministic Gate -->
-        <mxCell id="msg17" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;17. Gate S09 Deterministic Code Barrier&lt;/b&gt; (Zero AI Self-Declaration - Law 5 &amp;amp; 7)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <mxCell id="msg17" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;17. S09 Gate Barrier&lt;/b&gt; (Hard-stop DO_NOT_PASS nếu Critical&gt;0; Faithfulness&lt;0.85 ➔ HOLD)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="615" y="1035" as="sourcePoint" />
             <mxPoint x="615" y="1070" as="targetPoint" />
@@ -245,7 +245,7 @@
         </mxCell>
 
         <!-- 18. JC -> DB: Update COMPLETED -->
-        <mxCell id="msg18" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;18. Update State: COMPLETED&lt;/b&gt; (PASS / HOLD / DO_NOT_PASS - Law 18)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+        <mxCell id="msg18" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;18. Update Job State: COMPLETED&lt;/b&gt; &amp;amp; Ghi nhận Gate Result (Law 18: completed &amp;ne; PASS)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="615" y="1095" as="sourcePoint" />
             <mxPoint x="855" y="1095" as="targetPoint" />
