@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram id="seq-lifecycle" name="4. Sequence Lifecycle &amp; Gate S09">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="1420" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Header Title Banner -->
+        <mxCell id="header_seq" value="&lt;b style=&quot;font-size: 18px;&quot;&gt;SƠ ĐỒ SEQUENCE: VÒNG ĐỜI XỬ LÝ JOB TỪ TIẾP NHẬN ĐẾN GATE S09&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 13px; opacity: 0.95;&quot;&gt;Luồng tương tác 8 thực thể xuyên suốt 2 AWS Accounts, Fargate Sandbox, S3 Object Lock &amp;amp; Cổng phê duyệt ngoại lệ&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#1a237e;strokeColor=#0d47a1;fontColor=#ffffff;align=center;verticalAlign=middle;arcSize=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1880" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- 8 LIFELINES -->
+        <!-- ======================================================== -->
+
+        <!-- 1. Caller -->
+        <mxCell id="ll_caller" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;CI / Developer&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Caller)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;strokeColor=#616161;fontColor=#212121;size=46;" vertex="1" parent="1">
+          <mxGeometry x="50" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 2. TI API v2 -->
+        <mxCell id="ll_api" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;TI API v2&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Account A :8000)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e8eaf6;strokeColor=#3f51b5;fontColor=#1a237e;size=46;" vertex="1" parent="1">
+          <mxGeometry x="290" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Job Controller -->
+        <mxCell id="ll_jc" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Job Controller&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Account A - Law 4.3)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e3f2fd;strokeColor=#1976d2;fontColor=#0d47a1;size=46;" vertex="1" parent="1">
+          <mxGeometry x="530" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 4. RDS PostgreSQL -->
+        <mxCell id="ll_db" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;RDS PostgreSQL&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Job Store Bền Vững)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#c8e6c9;strokeColor=#388e3c;fontColor=#1b5e20;size=46;" vertex="1" parent="1">
+          <mxGeometry x="770" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Bedrock Harness -->
+        <mxCell id="ll_harness" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Bedrock Harness&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Account B - us-east-1)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontColor=#4a148c;size=46;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Fargate Sandbox -->
+        <mxCell id="ll_fargate" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;Fargate Sandbox&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Task-per-Job Enclave)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#e8f5e9;strokeColor=#2e7d32;fontColor=#1b5e20;size=46;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 7. S3 Object Lock -->
+        <mxCell id="ll_s3" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;S3 Object Lock&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Evidence Store WORM)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#c8e6c9;strokeColor=#388e3c;fontColor=#1b5e20;size=46;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- 8. QA Lead -->
+        <mxCell id="ll_qa" value="&lt;b style=&quot;font-size: 13.5px;&quot;&gt;QA Lead / Authority&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 11.5px;&quot;&gt;(Cổng Duyệt Ngoại Lệ)&lt;/span&gt;" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff8e1;strokeColor=#ffa000;fontColor=#ff6f00;size=46;" vertex="1" parent="1">
+          <mxGeometry x="1730" y="95" width="170" height="1245" as="geometry" />
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 1: ADMISSION & IMMEDIATE ACCEPTANCE -->
+        <!-- ======================================================== -->
+        <mxCell id="phase1_box" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;GIAI ĐOẠN 1: TIẾP NHẬN &amp;amp; PHẢN HỒI BẤT ĐỒNG BỘ TỨC THÌ (ADMISSION LAYER)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#f0f4c3;strokeColor=#c0ca33;fontColor=#827717;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="155" width="1820" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- 1. Caller -> API -->
+        <mxCell id="msg1" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;1. POST /v2/artifact-jobs&lt;/b&gt; (Artifact + SHA-256)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1565c0;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="195" as="sourcePoint" />
+            <mxPoint x="375" y="195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 2. API -> JC -->
+        <mxCell id="msg2" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;2. Enqueue Job &amp;amp; Schema Validate&lt;/b&gt;" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1565c0;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="375" y="230" as="sourcePoint" />
+            <mxPoint x="615" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 3. JC -> DB -->
+        <mxCell id="msg3" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;3. Ghi QUEUED &amp;amp; Token Budget&lt;/b&gt;" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="265" as="sourcePoint" />
+            <mxPoint x="855" y="265" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 4. API to Caller (Async Response) -->
+        <mxCell id="msg4" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;4. 202 Accepted {job_id}&lt;/b&gt; (Giải phóng kết nối &amp;lt; 1s)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#d32f2f;strokeWidth=1.5;fontColor=#b71c1c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="375" y="300" as="sourcePoint" />
+            <mxPoint x="135" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 2: AI ANALYSIS & CANDIDATE GENERATION (S01 - S06) -->
+        <!-- ======================================================== -->
+        <mxCell id="phase2_box" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;GIAI ĐOẠN 2: PHÂN TÍCH TÁC ĐỘNG &amp;amp; SINH KỊCH BẢN (S01–S06) — ACCOUNT B (us-east-1)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#ede7f6;strokeColor=#b39ddb;fontColor=#4a148c;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="340" width="1820" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- 5. JC -> Harness -->
+        <mxCell id="msg5" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;5. InvokeHarness&lt;/b&gt; (Context, AST diff, Token Budget)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="380" as="sourcePoint" />
+            <mxPoint x="1095" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 6. Harness self-loop S03 & S04 -->
+        <mxCell id="msg6" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;6. S03 Impact &amp;amp; S04 Risk Tiering&lt;/b&gt; (Opus 5 nếu Risk == CRITICAL)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="415" as="sourcePoint" />
+            <mxPoint x="1095" y="450" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1165" y="415" />
+              <mxPoint x="1165" y="450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 7. Harness self-loop S05 & S06 -->
+        <mxCell id="msg7" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;7. S05 Planning &amp;amp; S06 Candidate Gen&lt;/b&gt; (Sonnet 5, Evals &amp;ge; 0.80)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="475" as="sourcePoint" />
+            <mxPoint x="1095" y="510" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1165" y="475" />
+              <mxPoint x="1165" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 8. Harness to JC (ToolIntent Response) -->
+        <mxCell id="msg8" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;8. Trả ToolIntent JSON&lt;/b&gt; (Symbolic Action, không secret - Law 10.1)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#7b1fa2;strokeWidth=1.5;fontColor=#4a148c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1095" y="545" as="sourcePoint" />
+            <mxPoint x="615" y="545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 3: ISOLATED RUNNER SANDBOX EXECUTION (S07) -->
+        <!-- ======================================================== -->
+        <mxCell id="phase3_box" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;GIAI ĐOẠN 3: ĐIỀU PHỐI &amp;amp; THỰC THI SANDBOX CÔ LẬP (S07) — PRIVATE SUBNET D9&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#e8f5e9;strokeColor=#a5d6a7;fontColor=#1b5e20;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="585" width="1820" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- 9. JC self-loop: TenantBinding & STS -->
+        <mxCell id="msg9" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;9. Resolve TenantBinding &amp;amp; cấp STS Short-lived Creds&lt;/b&gt; (Law 13)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="625" as="sourcePoint" />
+            <mxPoint x="615" y="660" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="685" y="625" />
+              <mxPoint x="685" y="660" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 10. JC -> DB: Update RUNNING -->
+        <mxCell id="msg10" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;10. Update Step: RUNNING&lt;/b&gt; (Lease TTL 5 mins)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="685" as="sourcePoint" />
+            <mxPoint x="855" y="685" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 11. JC -> Fargate: RunTask -->
+        <mxCell id="msg11" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;11. Direct Dispatch: ECS RunTask&lt;/b&gt; (Launch Fargate Task-per-Job)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="720" as="sourcePoint" />
+            <mxPoint x="1335" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Loop Heartbeat Frame -->
+        <mxCell id="loop_hb" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;loop&lt;/b&gt; &lt;span style=&quot;font-size: 11px;&quot;&gt;[Heartbeat định kỳ 60s]&lt;/span&gt;" style="shape=umlFrame;whiteSpace=wrap;html=1;width=180;height=20;fillColor=none;strokeColor=#4caf50;strokeWidth=1.5;fontColor=#2e7d32;fontFamily=Segoe UI, Arial, sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="575" y="745" width="800" height="52" as="geometry" />
+        </mxCell>
+
+        <!-- 12. Fargate to JC Heartbeat -->
+        <mxCell id="msg12" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;12. Gửi Heartbeat gia hạn Worker Lease TTL&lt;/b&gt;" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="775" as="sourcePoint" />
+            <mxPoint x="615" y="775" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 13. Fargate self-loop test execution -->
+        <mxCell id="msg13" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;13. Thực thi kiểm thử cô lập&lt;/b&gt; (Playwright/k6/Flyway/Semgrep - NO-INTERNET)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="820" as="sourcePoint" />
+            <mxPoint x="1335" y="855" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1405" y="820" />
+              <mxPoint x="1405" y="855" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 14. Fargate -> S3: Raw Evidence -->
+        <mxCell id="msg14" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;14. Direct-to-S3 Offloading:&lt;/b&gt; Ghi Raw Logs, Video, Traces ($0 VPC Gateway)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="885" as="sourcePoint" />
+            <mxPoint x="1575" y="885" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 15. Fargate to JC Finished -->
+        <mxCell id="msg15" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;15. Báo cáo hoàn tất tác vụ&lt;/b&gt; (Finished + Envelope ~2 KB)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="920" as="sourcePoint" />
+            <mxPoint x="615" y="920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 4: EVIDENCE DIGEST & GATE S09 BARRIER -->
+        <!-- ======================================================== -->
+        <mxCell id="phase4_box" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;GIAI ĐOẠN 4: ĐÓNG BẰNG CHỨNG BẤT BIẾN &amp;amp; PHÁN QUYẾT GATE S09 (DETERMINISTIC BARRIER)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#e1f5fe;strokeColor=#81d4fa;fontColor=#0277bd;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="960" width="1820" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- 16. JC -> S3: Object Lock -->
+        <mxCell id="msg16" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;16. Băm SHA-256 Digest &amp;amp; Khóa S3 Object Lock&lt;/b&gt; (WORM 90 ngày - Law 16)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="1000" as="sourcePoint" />
+            <mxPoint x="1575" y="1000" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 17. JC self-loop: S09 Deterministic Gate -->
+        <mxCell id="msg17" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;17. Gate S09 Deterministic Code Barrier&lt;/b&gt; (Zero AI Self-Declaration - Law 5 &amp;amp; 7)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#1976d2;strokeWidth=1.5;fontColor=#0d47a1;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="1035" as="sourcePoint" />
+            <mxPoint x="615" y="1070" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="685" y="1035" />
+              <mxPoint x="685" y="1070" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 18. JC -> DB: Update COMPLETED -->
+        <mxCell id="msg18" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;18. Update State: COMPLETED&lt;/b&gt; (PASS / HOLD / DO_NOT_PASS - Law 18)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#388e3c;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="615" y="1095" as="sourcePoint" />
+            <mxPoint x="855" y="1095" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 5: POLLING & WAIVER APPROVAL -->
+        <!-- ======================================================== -->
+        <mxCell id="phase5_box" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;GIAI ĐOẠN 5: POLLING KẾT QUẢ &amp;amp; PHÊ DUYỆT NGOẠI LỆ WAIVER (HUMAN-IN-THE-LOOP)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fillColor=#fff9c4;strokeColor=#fff59d;fontColor=#f57f17;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1135" width="1820" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- Loop Polling Frame -->
+        <mxCell id="loop_poll" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;loop&lt;/b&gt; &lt;span style=&quot;font-size: 11px;&quot;&gt;[Caller Polling định kỳ]&lt;/span&gt;" style="shape=umlFrame;whiteSpace=wrap;html=1;width=200;height=20;fillColor=none;strokeColor=#ffb74d;strokeWidth=1.5;fontColor=#e65100;fontFamily=Segoe UI, Arial, sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="90" y="1170" width="330" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- 19. Caller -> API: Poll -->
+        <mxCell id="msg19" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;19. GET /v2/artifact-jobs/{id}&lt;/b&gt;" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#e65100;strokeWidth=1.5;fontColor=#e65100;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="135" y="1195" as="sourcePoint" />
+            <mxPoint x="375" y="1195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 20. API to Caller Status -->
+        <mxCell id="msg20" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;20. 200 OK&lt;/b&gt; {state: COMPLETED, gate: HOLD}" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#e65100;strokeWidth=1.5;fontColor=#e65100;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="375" y="1220" as="sourcePoint" />
+            <mxPoint x="135" y="1220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Opt Waiver Frame -->
+        <mxCell id="opt_waiver" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;opt&lt;/b&gt; &lt;span style=&quot;font-size: 11px;&quot;&gt;[Nếu Gate là HOLD: Có phát hiện cần phê duyệt ngoại lệ]&lt;/span&gt;" style="shape=umlFrame;whiteSpace=wrap;html=1;width=320;height=20;fillColor=none;strokeColor=#d32f2f;strokeWidth=1.5;fontColor=#b71c1c;fontFamily=Segoe UI, Arial, sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1245" width="1530" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- 21. QA -> API: Waiver -->
+        <mxCell id="msg21" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;21. POST /v2/operations/{id}/actions&lt;/b&gt; (Submit Approved Waiver)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#d32f2f;strokeWidth=1.5;fontColor=#b71c1c;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1815" y="1275" as="sourcePoint" />
+            <mxPoint x="375" y="1275" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 22. API -> DB: Update PASS -->
+        <mxCell id="msg22" value="&lt;b style=&quot;font-size: 12px;&quot;&gt;22. Cập nhật Release Decision: PASS&lt;/b&gt; (Đủ điều kiện Deploy)" style="html=1;verticalAlign=bottom;endArrow=block;rounded=0;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;strokeColor=#2e7d32;strokeWidth=1.5;fontColor=#1b5e20;labelBackgroundColor=#ffffff;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="375" y="1310" as="sourcePoint" />
+            <mxPoint x="855" y="1310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- FOOTER BAR -->
+        <mxCell id="footer_seq" value="&lt;b style=&quot;font-size: 12.5px;&quot;&gt;BẢO CHỨNG BỞI ARCHITECTURE LAWS:&lt;/b&gt; &amp;nbsp;&lt;span style=&quot;font-size: 12px;&quot;&gt;• &lt;b&gt;Law 4.3&lt;/b&gt;: Sổ cái thẩm quyền duy nhất &amp;nbsp;• &lt;b&gt;Law 5 &amp;amp; 7&lt;/b&gt;: Zero AI Self-Declaration &amp;nbsp;• &lt;b&gt;Law 10.1 &amp;amp; 13&lt;/b&gt;: ToolIntent không mang secret &amp;nbsp;• &lt;b&gt;Law 16&lt;/b&gt;: S3 WORM SHA-256 &amp;nbsp;• &lt;b&gt;Law 18&lt;/b&gt;: completed &amp;ne; PASS &amp;nbsp;• &lt;b&gt;Law 23&lt;/b&gt;: IsolatedRunner contract&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Segoe UI, Arial, sans-serif;fontSize=12;fillColor=#eceff1;strokeColor=#90a4ae;fontColor=#37474f;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1350" width="1880" height="40" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

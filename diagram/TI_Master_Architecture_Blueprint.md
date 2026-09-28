@@ -54,6 +54,8 @@ Hệ thống tuân thủ nghiêm ngặt **24 Architecture Laws** của TI, trong
 
 ## 2. MÔ HÌNH HỢP NHẤT 3 TẦNG KIẾN TRÚC TI (3-TIER ARCHITECTURAL FRAMEWORK)
 
+> 📊 **Bản vẽ trực quan Draw.io:** [TI_3Tier_Architecture.drawio](images/TI_3Tier_Architecture.drawio) · *Master Workbook Tab 1:* [TI_Master_Architecture.drawio](images/TI_Master_Architecture.drawio)
+
 Bản thiết kế này chuẩn hóa và tích hợp toàn diện đóng góp từ cả 4 nhóm chuyên trách thành 3 phân tầng kiến trúc chính thức:
 
 ```
@@ -135,7 +137,17 @@ Bản thiết kế này chuẩn hóa và tích hợp toàn diện đóng góp t�
 
 ## 3. SƠ ĐỒ KIẾN TRÚC TỔNG THỂ (C4 MODEL DIAGRAMS)
 
+> 📐 **KHO BẢN VẼ DRAW.IO CHÍNH THỨC (EDITABLE & ENTERPRISE GRADE):**  
+> Toàn bộ các sơ đồ dưới đây đã được số hóa và chuẩn hóa sang định dạng Draw.io XML (`.drawio`) tương tác, tích hợp đầy đủ **bộ icon AWS chính hãng** (CloudFront, WAF, ECS, Fargate, RDS PostgreSQL, S3 Object Lock, Bedrock AI, Aurora Serverless v2, STS, IAM, PrivateLink VPC Endpoints), có thể xem và chỉnh sửa trực tiếp trên [draw.io / diagrams.net](https://app.diagrams.net) hoặc VS Code Draw.io Integration:
+> - 🌟 **Master Workbook (4-in-1 Tabs):** [TI_Master_Architecture.drawio](images/TI_Master_Architecture.drawio)
+> - 📄 **1. Mô hình 3 tầng kiến trúc:** [TI_3Tier_Architecture.drawio](images/TI_3Tier_Architecture.drawio) *(AWS Bedrock, Organizations, Fargate, PrivateLink, Aurora)*
+> - 📄 **2. C4 Level 2 Deployment Topology:** [TI_C4_L2_Topology.drawio](images/TI_C4_L2_Topology.drawio) *(CloudFront, WAF, ECS, RDS, S3 Lock, Bedrock, Fargate Tasks, PrivateLink, Aurora)*
+> - 📄 **3. C4 Level 3 Job Controller Deep Dive:** [TI_C4_L3_JobController.drawio](images/TI_C4_L3_JobController.drawio) *(RDS, STS, ECS/Fargate Tasks, S3 Lock)*
+> - 📄 **4. Sequence Vòng đời tương tác & Gate S09:** [TI_Sequence_Lifecycle.drawio](images/TI_Sequence_Lifecycle.drawio) *(Lifelines gắn icon ECS, RDS, Bedrock, Fargate, S3 Lock)*
+
 ### 3.1. Sơ đồ C4 Level 2: Container & Deployment Topology (Toàn cảnh 3 vùng)
+
+> 📊 **Bản vẽ trực quan Draw.io:** [TI_C4_L2_Topology.drawio](images/TI_C4_L2_Topology.drawio) · *Master Workbook Tab 2:* [TI_Master_Architecture.drawio](images/TI_Master_Architecture.drawio)
 
 ```mermaid
 flowchart TB
@@ -253,6 +265,8 @@ flowchart TB
 
 ### 3.2. Sơ đồ C4 Level 3: Zoom sâu bên trong Job Controller (Workflow Authority)
 
+> 📊 **Bản vẽ trực quan Draw.io:** [TI_C4_L3_JobController.drawio](images/TI_C4_L3_JobController.drawio) · *Master Workbook Tab 3:* [TI_Master_Architecture.drawio](images/TI_Master_Architecture.drawio)
+
 Sơ đồ thể hiện rõ cách Job Controller thực hiện phân giải và dispatch ngang hàng, **loại bỏ hoàn toàn hiểu lầm kiến trúc Fargate lồng Fargate**:
 
 ```mermaid
@@ -307,6 +321,8 @@ flowchart TD
 ---
 
 ### 3.3. Sơ đồ Sequence: Vòng đời xử lý một Job từ Tiếp nhận đến Gate S09
+
+> 📊 **Bản vẽ trực quan Draw.io:** [TI_Sequence_Lifecycle.drawio](images/TI_Sequence_Lifecycle.drawio) · *Master Workbook Tab 4:* [TI_Master_Architecture.drawio](images/TI_Master_Architecture.drawio)
 
 ```mermaid
 sequenceDiagram
