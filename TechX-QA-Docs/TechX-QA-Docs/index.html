@@ -1,0 +1,151 @@
+<title>TechX QA & Security Platforms — Báo cáo tổng hợp</title>
+<style>
+  :root{
+    --paper:#f6f4f0; --surface:#ffffff; --surface-2:#efece6; --ink:#201d1a; --ink-dim:#6e6a63;
+    --border:#ddd7cc; --accent-pentest:#b3402a; --accent-qa:#1f7a72; --status-wip:#a6720a; --status-wip-bg:#f3e6c8;
+    --code-bg:#14161a; --code-ink:#dbe4df; --code-border:#2a2e33;
+    --shadow:0 1px 2px rgba(32,29,26,.06), 0 8px 24px -12px rgba(32,29,26,.12);
+    --font-display:Georgia,'Iowan Old Style','Palatino Linotype','URW Palladio L',serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#15171a; --surface:#1b1e22; --surface-2:#21242a; --ink:#e9e6df; --ink-dim:#9b9790;
+      --border:#2c2f34; --accent-pentest:#e2734f; --accent-qa:#4fb3a8; --status-wip:#e0a83c; --status-wip-bg:rgba(224,168,60,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5); }
+  }
+  :root[data-theme="dark"]{ --paper:#15171a; --surface:#1b1e22; --surface-2:#21242a; --ink:#e9e6df; --ink-dim:#9b9790;
+    --border:#2c2f34; --accent-pentest:#e2734f; --accent-qa:#4fb3a8; --status-wip:#e0a83c; --status-wip-bg:rgba(224,168,60,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5); }
+  :root[data-theme="light"]{ --paper:#f6f4f0; --surface:#ffffff; --surface-2:#efece6; --ink:#201d1a; --ink-dim:#6e6a63;
+    --border:#ddd7cc; --accent-pentest:#b3402a; --accent-qa:#1f7a72; --status-wip:#a6720a; --status-wip-bg:#f3e6c8;
+    --shadow:0 1px 2px rgba(32,29,26,.06), 0 8px 24px -12px rgba(32,29,26,.12); }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  a{color:var(--ink);}
+  a:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+
+  .wrap{max-width:980px;margin:0 auto;padding:3.2rem clamp(1.25rem,4vw,2.5rem) 4rem;}
+  .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 .7rem;}
+  h1.title{font-family:var(--font-display);font-weight:600;font-size:clamp(2rem,4vw,2.9rem);margin:0 0 .7rem;text-wrap:balance;letter-spacing:-.01em;}
+  .tagline{font-size:1.08rem;color:var(--ink-dim);max-width:66ch;margin:0 0 1.6rem;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:.5rem .8rem;font-family:var(--font-mono);font-size:.78rem;color:var(--ink-dim);margin-bottom:2.8rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+
+  h2{font-family:var(--font-display);font-size:1.3rem;margin:0 0 1.2rem;}
+  .section-eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 .5rem;}
+  section{margin:0 0 3rem;}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem;margin-bottom:1rem;}
+  .card{border:1px solid var(--border);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+  .card-bar{height:4px;}
+  .card-body{padding:1.5rem 1.6rem 1.7rem;display:flex;flex-direction:column;gap:.9rem;flex:1;}
+  .card-kicker{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;}
+  .card h3{font-family:var(--font-display);font-size:1.35rem;margin:0;}
+  .card p.desc{color:var(--ink-dim);font-size:.94rem;margin:0;max-width:48ch;}
+  .status-pill{align-self:flex-start;display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:999px;background:var(--status-wip-bg);color:var(--status-wip);font-family:var(--font-mono);font-size:.75rem;font-weight:600;}
+  .status-pill::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:currentColor;}
+  .card-links{display:flex;flex-direction:column;gap:.5rem;font-family:var(--font-mono);font-size:.85rem;margin-top:.3rem;}
+  .card-links a{text-decoration:none;color:var(--ink);border-bottom:1px solid var(--border);padding-bottom:1px;width:fit-content;}
+  .card-links a:hover{color:var(--pentest,var(--accent-pentest));}
+  .card.qa .card-links a:hover{color:var(--accent-qa);}
+  .card.pt .card-links a:hover{color:var(--accent-pentest);}
+  .card-doc-link{margin-top:auto;display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.85rem;font-weight:600;text-decoration:none;padding:.65rem 0 0;border-top:1px solid var(--border);}
+  .card.pt .card-doc-link{color:var(--accent-pentest);}
+  .card.qa .card-doc-link{color:var(--accent-qa);}
+
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin:0 0 1.4rem;}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:560px;}
+  th,td{padding:.65rem .9rem;text-align:left;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);background:var(--surface-2);white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  td a{border-bottom:1px solid var(--border);text-decoration:none;}
+  td a:hover{color:var(--ink);}
+
+  .callout{border:1px solid var(--border);border-left:3px solid var(--status-wip);background:var(--surface);border-radius:0 10px 10px 0;padding:1.1rem 1.3rem;margin:0 0 1rem;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--status-wip);margin:0 0 .5rem;font-weight:700;}
+  .callout p{margin:0;max-width:70ch;}
+
+  footer{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border);color:var(--ink-dim);font-family:var(--font-mono);font-size:.78rem;}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">TechX Corp · Internal engineering</p>
+  <h1 class="title">Báo cáo tổng hợp: nguồn & trạng thái triển khai</h1>
+  <p class="tagline">Hai nền tảng AI QA/Security nội bộ — source repo, domain/sandbox đang chạy, và trọng tâm đang làm của từng bên. Xem tài liệu onboarding đầy đủ ở link riêng của mỗi dự án.</p>
+  <div class="meta-row">
+    <span>Cập nhật 2026-09-28</span>
+    <span>·</span>
+    <span>Chủ trì: Hưng Nguyễn</span>
+  </div>
+
+  <section id="projects">
+    <p class="section-eyebrow">Dự án</p>
+    <h2>Hai nền tảng</h2>
+    <div class="card-grid">
+
+      <div class="card pt">
+        <div class="card-bar" style="background:var(--accent-pentest);"></div>
+        <div class="card-body">
+          <span class="card-kicker" style="color:var(--accent-pentest);">security-test-platform</span>
+          <h3>Pentest</h3>
+          <p class="desc">Harness tự động red-team AI trên 4 lớp: LLM, web, API, agent dùng tool — leo thang thích ứng, tự chấm điểm, ánh xạ OWASP.</p>
+          <span class="status-pill">Agent Layer (QA-29) — hoàn thiện retest</span>
+          <div class="card-links">
+            <a href="https://github.com/TechX-Corp/security-test-platform" target="_blank" rel="noopener">↗ Source — github.com/TechX-Corp/security-test-platform</a>
+          </div>
+          <a class="card-doc-link" href="https://claude.ai/code/artifact/7cf7f650-8573-4165-9676-9f3a6b4f6231" target="_blank" rel="noopener">Xem tài liệu onboarding đầy đủ →</a>
+        </div>
+      </div>
+
+      <div class="card qa">
+        <div class="card-bar" style="background:var(--accent-qa);"></div>
+        <div class="card-body">
+          <span class="card-kicker" style="color:var(--accent-qa);">qa-agent</span>
+          <h3>QA Cat</h3>
+          <p class="desc">Multi-agent QA trên Bedrock: browser testing tự động, A/B prompt eval, RAGAS eval cho RAG chatbot, sinh test plan/case từ requirement.</p>
+          <span class="status-pill">MLflow (thay RAGAS) — hoàn thiện retest</span>
+          <div class="card-links">
+            <a href="https://github.com/TechX-Corp/qa-agent" target="_blank" rel="noopener">↗ Source — github.com/TechX-Corp/qa-agent</a>
+            <a href="https://qa-agent.techxcorp.com/" target="_blank" rel="noopener">↗ Sandbox — qa-agent.techxcorp.com</a>
+          </div>
+          <a class="card-doc-link" href="https://claude.ai/code/artifact/00715930-6d1d-45ca-9b7d-1f7471ba5ab2" target="_blank" rel="noopener">Xem tài liệu onboarding đầy đủ →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="status">
+    <p class="section-eyebrow">Trạng thái</p>
+    <h2>Đang làm gì, chờ gì</h2>
+    <div class="callout">
+      <p class="callout-label">Ghi chú chung</p>
+      <p>Cả hai phần đang phát triển — Agent Layer bên Pentest và tích hợp MLflow bên qa-agent — hiện đang trong giai đoạn hoàn thiện, retest lại trước khi đưa lên (merge/deploy). Bảng dưới tổng hợp nhanh để tiện theo dõi.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Dự án</th><th>Source</th><th>Live/Sandbox</th><th>Trọng tâm hiện tại</th><th>Nhánh làm việc</th></tr>
+        <tr>
+          <td>Pentest</td>
+          <td><a href="https://github.com/TechX-Corp/security-test-platform" target="_blank" rel="noopener">security-test-platform</a></td>
+          <td>Chưa deploy</td>
+          <td>Agent Layer (QA-29): red-team agent dùng tool thật qua HTTP/SSE + PyRIT cross-check</td>
+          <td><code>feat/qa-29-agent-layer</code></td>
+        </tr>
+        <tr>
+          <td>QA Cat (qa-agent)</td>
+          <td><a href="https://github.com/TechX-Corp/qa-agent" target="_blank" rel="noopener">qa-agent</a></td>
+          <td><a href="https://qa-agent.techxcorp.com/" target="_blank" rel="noopener">qa-agent.techxcorp.com</a> (sandbox EC2, nội bộ)</td>
+          <td>MLflow: tracing/tracking + tab Lab, dần thay scorer RAGAS tự viết bằng judge của MLflow</td>
+          <td><code>feat/mlflow-spike-phase-00</code></td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Tài liệu này liên kết tới 2 bộ onboarding đầy đủ — mỗi bộ mô tả kiến trúc toàn dự án và đào sâu phần đang phát triển. Nội dung tổng hợp từ PROJECT.md / README.md và mã nguồn hiện có tại thời điểm cập nhật.</span>
+  </footer>
+</div>

@@ -1,0 +1,292 @@
+<title>QA Cat (qa-agent) — AI QA Testing Platform | Tài liệu onboarding</title>
+<style>
+  :root{
+    --paper:#f6f4f0; --surface:#ffffff; --surface-2:#efece6; --ink:#201d1a; --ink-dim:#6e6a63;
+    --border:#ddd7cc; --accent-pentest:#b3402a; --accent-qa:#1f7a72; --status-wip:#a6720a; --status-wip-bg:#f3e6c8;
+    --code-bg:#14161a; --code-ink:#dbe4df; --code-border:#2a2e33;
+    --shadow:0 1px 2px rgba(32,29,26,.06), 0 8px 24px -12px rgba(32,29,26,.12);
+    --accent:var(--accent-qa);
+    --font-display:Georgia,'Iowan Old Style','Palatino Linotype','URW Palladio L',serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#15171a; --surface:#1b1e22; --surface-2:#21242a; --ink:#e9e6df; --ink-dim:#9b9790;
+      --border:#2c2f34; --accent-pentest:#e2734f; --accent-qa:#4fb3a8; --status-wip:#e0a83c; --status-wip-bg:rgba(224,168,60,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5); }
+  }
+  :root[data-theme="dark"]{ --paper:#15171a; --surface:#1b1e22; --surface-2:#21242a; --ink:#e9e6df; --ink-dim:#9b9790;
+    --border:#2c2f34; --accent-pentest:#e2734f; --accent-qa:#4fb3a8; --status-wip:#e0a83c; --status-wip-bg:rgba(224,168,60,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5); }
+  :root[data-theme="light"]{ --paper:#f6f4f0; --surface:#ffffff; --surface-2:#efece6; --ink:#201d1a; --ink-dim:#6e6a63;
+    --border:#ddd7cc; --accent-pentest:#b3402a; --accent-qa:#1f7a72; --status-wip:#a6720a; --status-wip-bg:#f3e6c8;
+    --shadow:0 1px 2px rgba(32,29,26,.06), 0 8px 24px -12px rgba(32,29,26,.12); }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+  ::selection{background:color-mix(in srgb, var(--accent) 30%, transparent);}
+  a{color:var(--ink);}
+  a:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .masthead{max-width:1180px;margin:0 auto;padding:3rem clamp(1.25rem,4vw,2.5rem) 2rem;border-bottom:1px solid var(--border);}
+  .breadcrumb{font-family:var(--font-mono);font-size:.78rem;color:var(--ink-dim);text-decoration:none;border-bottom:1px solid transparent;}
+  .breadcrumb:hover{color:var(--accent);border-color:var(--accent);}
+  .eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:1rem 0 .6rem;}
+  h1.title{font-family:var(--font-display);font-weight:600;font-size:clamp(1.8rem,3.4vw,2.6rem);margin:0 0 .6rem;text-wrap:balance;letter-spacing:-.01em;}
+  .tagline{font-size:1.05rem;color:var(--ink-dim);max-width:64ch;margin:0 0 1.4rem;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:.6rem .8rem;align-items:center;font-family:var(--font-mono);font-size:.82rem;}
+  .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:999px;border:1px solid var(--border);background:var(--surface);}
+  .pill.status-wip{color:var(--status-wip);background:var(--status-wip-bg);border-color:transparent;font-weight:600;}
+  .pill.status-wip::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:currentColor;}
+  a.meta-link{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px;}
+  a.meta-link:hover{border-color:var(--accent);color:var(--accent);}
+
+  .layout{max-width:1180px;margin:0 auto;padding:2.5rem clamp(1.25rem,4vw,2.5rem) 5rem;display:grid;grid-template-columns:220px minmax(0,1fr);gap:clamp(2rem,4vw,4rem);align-items:start;}
+  nav.toc{position:sticky;top:2rem;display:flex;flex-direction:column;gap:.55rem;font-family:var(--font-mono);font-size:.82rem;}
+  nav.toc a{color:var(--ink-dim);text-decoration:none;padding:.15rem 0 .15rem .7rem;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--accent);}
+  main.content{max-width:760px;min-width:0;}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{position:static;flex-direction:row;flex-wrap:wrap;gap:.5rem .9rem;padding-bottom:1.1rem;margin-bottom:1.6rem;border-bottom:1px solid var(--border);}
+    nav.toc a{border-left:none;padding-left:0;}
+  }
+
+  section{margin:0 0 3.2rem;scroll-margin-top:2rem;}
+  .section-eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 .5rem;}
+  h2{font-family:var(--font-display);font-size:1.55rem;margin:0 0 1rem;text-wrap:balance;}
+  h3{font-family:var(--font-display);font-size:1.15rem;margin:1.7rem 0 .7rem;}
+  p{margin:0 0 1rem;max-width:68ch;}
+  ul,ol{margin:0 0 1.1rem;padding-left:1.3rem;}
+  li{margin-bottom:.45rem;max-width:66ch;}
+  strong{font-weight:650;}
+  hr.rule{border:none;border-top:1px solid var(--border);margin:2.6rem 0;}
+
+  .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin:0 0 1.4rem;}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:520px;}
+  th,td{padding:.6rem .85rem;text-align:left;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);background:var(--surface-2);white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface-2);}
+
+  pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--code-border);border-radius:10px;padding:1rem 1.1rem;overflow-x:auto;font-family:var(--font-mono);font-size:.8rem;line-height:1.6;margin:0 0 1.4rem;}
+  code{font-family:var(--font-mono);font-size:.86em;}
+  :not(pre)>code{background:var(--surface-2);padding:.15em .4em;border-radius:5px;border:1px solid var(--border);}
+  pre code{background:none;border:none;padding:0;}
+
+  .callout{border:1px solid var(--border);border-left:3px solid var(--status-wip);background:var(--surface);border-radius:0 10px 10px 0;padding:1.1rem 1.3rem;margin:0 0 1.6rem;box-shadow:var(--shadow);}
+  .callout .callout-label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--status-wip);margin:0 0 .5rem;font-weight:700;}
+  .callout p:last-child{margin-bottom:0;}
+
+  .layer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:0 0 1.6rem;}
+  .layer-card{border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;background:var(--surface);}
+  .layer-card .k{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);}
+  .layer-card h4{margin:.35rem 0 .35rem;font-family:var(--font-display);font-size:1.05rem;}
+  .layer-card p{font-size:.88rem;color:var(--ink-dim);margin:0;}
+
+  figure.shot{margin:0 0 1.6rem;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);}
+  figure.shot img{display:block;width:100%;height:auto;}
+  figure.shot figcaption{padding:.6rem .9rem;font-family:var(--font-mono);font-size:.78rem;color:var(--ink-dim);border-top:1px solid var(--border);}
+  .shot-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;}
+
+  footer{max-width:1180px;margin:0 auto;padding:2rem clamp(1.25rem,4vw,2.5rem) 3rem;color:var(--ink-dim);font-family:var(--font-mono);font-size:.78rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;justify-content:space-between;}
+  footer a{color:var(--ink-dim);}
+  footer a:hover{color:var(--accent);}
+</style>
+
+<header class="masthead">
+  <a class="breadcrumb" href="index.html">← Báo cáo tổng hợp TechX QA/Security</a>
+  <p class="eyebrow">qa-agent · AI QA testing platform</p>
+  <h1 class="title">QA Cat — Bedrock-driven Multi-agent QA</h1>
+  <p class="tagline">Hệ multi-agent chạy trên AWS Bedrock, điều khiển một trình duyệt thật (Playwright hoặc AWS AgentCore) để test chatbot, website và API — cộng thêm A/B prompt eval, RAGAS eval cho RAG chatbot, và sinh test plan/test case từ requirement.</p>
+  <div class="meta-row">
+    <span class="pill status-wip">Đang hoàn thiện MLflow</span>
+    <a class="meta-link" href="https://github.com/TechX-Corp/qa-agent" target="_blank" rel="noopener">Source · GitHub</a>
+    <a class="meta-link" href="https://qa-agent.techxcorp.com/" target="_blank" rel="noopener">Sandbox · qa-agent.techxcorp.com</a>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <a href="#overview">Tổng quan</a>
+    <a href="#architecture">Kiến trúc & stack</a>
+    <a href="#webui">Trải nghiệm Web UI</a>
+    <a href="#layout">Cấu trúc dự án</a>
+    <a href="#mlflow">MLflow</a>
+    <a href="#deploy">Deploy</a>
+    <a href="#cli">CLI</a>
+    <a href="#learn-more">Tìm hiểu thêm</a>
+    <a href="#refs">Tham khảo</a>
+  </nav>
+
+  <main class="content">
+    <section id="overview">
+      <p class="section-eyebrow">01 · Tổng quan</p>
+      <h2>Bốn công cụ, một Project</h2>
+      <p>Mọi thứ bên dưới đều xoay quanh khái niệm <strong>Project</strong> — cấu hình một lần (nguồn KB, cách chunk, guardrail) qua setup wizard, rồi tái sử dụng ở mọi tool. Đổi project từ sidebar, mỗi tool tự scope dữ liệu theo project hiện tại.</p>
+      <div class="layer-grid">
+        <div class="layer-card"><span class="k">1 · browser testing</span><h4>Multi-agent browser testing</h4><p>Mô tả mục tiêu bằng ngôn ngữ tự nhiên → Planner (Opus 4.7) chia task → Executor (Sonnet 4) lái trình duyệt → Critic (Opus 4.7) chấm APPROVE/RETRY/REPLAN/SKIP → Supervisor điều phối, lưu version plan bất biến.</p></div>
+        <div class="layer-card"><span class="k">2 · prompt eval</span><h4>A/B test prompt variants</h4><p>So 2–4 phiên bản system prompt trên cùng bộ test case, judge LLM chấm theo tiêu chí tuỳ biến, bảng so sánh win-rate + điểm trung bình + delta từng tiêu chí.</p></div>
+        <div class="layer-card"><span class="k">3 · ragas eval</span><h4>Black-box chatbot evaluation</h4><p>Chấm câu trả lời RAG chatbot theo metric RAGAS (Faithfulness, Answer Relevancy, Context Precision/Recall) mà không cần truy cập nội bộ chatbot. Đây là phần đang chuyển dần lên MLflow — xem mục MLflow.</p></div>
+        <div class="layer-card"><span class="k">4 · test plan/case</span><h4>Sinh test từ requirement</h4><p>Biến requirement thô (text/file/Confluence) thành test plan kiểu IEEE-829, rồi sinh test case theo khuôn SEAM-A 8 trường, luôn trace ngược về plan.</p></div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <p class="section-eyebrow">02 · Kiến trúc</p>
+      <h2>Stack & luồng dữ liệu</h2>
+      <pre><code>React UI (:5173) ──WebSocket v2──&gt; FastAPI (:8000)
+  Vite + TS + Zustand    /api/ws/agent/v2    Supervisor orchestrator
+  shadcn + Tailwind                          ├─ Planner   (Bedrock)
+        │ iframe (DCV live view)             ├─ Executor  (Bedrock)
+        ▼                                    └─ Critic    (Bedrock)
+  DCV Web Viewer ──SigV4-signed CDP──&gt; Browser backend:
+  (1920×1080)                            • AgentCore (AWS)
+                                          • Playwright local</code></pre>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Layer</th><th>Công nghệ</th></tr>
+          <tr><td>Backend</td><td>Python 3.14, FastAPI, native Playwright, boto3</td></tr>
+          <tr><td>LLM</td><td>AWS Bedrock Converse API (Opus 4.7 + Sonnet 4)</td></tr>
+          <tr><td>Embeddings</td><td>AWS Bedrock Titan Embed v2 (semantic search + faithfulness scoring)</td></tr>
+          <tr><td>Frontend</td><td>React 18, Vite, TypeScript, Tailwind, shadcn/ui, Zustand</td></tr>
+          <tr><td>Browser</td><td>AgentCore Browser (cloud, DCV) hoặc Playwright (local, headless + MJPEG)</td></tr>
+          <tr><td>Storage</td><td>SQLite — session, chat, agent runs/plans, project + artifact, RAGAS test case/run, testgen spec/plan/case</td></tr>
+        </table>
+      </div>
+      <p>Hai browser backend chọn qua <code>QA_AGENT_BROWSER_BACKEND</code>: <code>playwright_local</code> cho dev/CI (miễn phí, MJPEG có overlay tương tác), <code>agentcore</code> cho production/demo (remote browser DCV thật, có nút "Take Control" để chuyển quyền lái từ agent sang người).</p>
+    </section>
+
+    <section id="webui">
+      <p class="section-eyebrow">03 · Trải nghiệm sử dụng</p>
+      <h2>Web UI</h2>
+      <p>Phần kiến trúc ở trên không cho thấy người dùng thực sự chạm vào những gì — dưới đây là từng màn hình chính theo đúng luồng dùng thật (<code>web/src/pages/</code>).</p>
+
+      <h3>Trang chủ — danh sách Project</h3>
+      <p>Landing page (<code>/</code>) liệt kê mọi Project đã tạo, mỗi Project gom các run/session của riêng nó, kèm nút Import/Export bundle để mang một Project sang máy khác.</p>
+      <figure class="shot">
+        <img src="img/qaagent-sessions.png" alt="Trang chủ: danh sách Project, mỗi project gom các run/session riêng" loading="lazy">
+        <figcaption>Trang chủ — chụp trực tiếp từ instance đang chạy local (localhost:5173), 22 project / 43 run thật.</figcaption>
+      </figure>
+
+      <h3>Project Setup Wizard — cấu hình một lần cho mỗi target</h3>
+      <p>5 bước tuần tự: <strong>Identity</strong> (tên + URL target) → <strong>KB Source</strong> (upload PDF/DOC/DOCX hoặc dán link SharePoint) → <strong>Chunk recipe</strong> (mặc định theo kiểu bot-aligned, hoặc upload spec chunk riêng) → <strong>Guardrail + Persona</strong> (hiện là stub, UI đầy đủ nằm ở giai đoạn sau) → <strong>Test plan</strong> (sinh tự động hoặc upload CSV/JSON). Nút Run chỉ mở khi đã có KB + chunk recipe — không bắt buộc đi hết mọi bước. Wizard nhớ tiến độ qua URL (<code>/projects/new?resume=&lt;id&gt;&amp;step=&lt;n&gt;</code>) nên đóng giữa chừng vẫn quay lại đúng bước đang dở.</p>
+      <figure class="shot">
+        <img src="img/qaagent-wizard.png" alt="Project Setup Wizard: bước Identity — tên + URL target" loading="lazy">
+        <figcaption>Project Setup Wizard — bước 1/5 (Identity).</figcaption>
+      </figure>
+
+      <h3>Workspace — nơi xem agent làm việc trực tiếp</h3>
+      <p>Bố cục 2 cột: <strong>BrowserPanel</strong> bên trái (2 phần diện tích) hiện trình duyệt mà agent đang lái theo thời gian thực; <strong>ChatPanel</strong> bên phải (1 phần, rộng 420–560px) là nơi gõ mục tiêu test bằng ngôn ngữ tự nhiên và xem Planner/Executor/Critic báo cáo tiến độ dạng chat. <strong>TargetUrlBar</strong> cố định trên cùng để đổi URL đang test giữa chừng. Mỗi phiên (session) được lưu lại — đóng trình duyệt rồi quay lại vẫn thấy đúng lịch sử chat và trạng thái. Sidebar bên trong một Project dẫn tới toàn bộ tool: QA Testing, Prompt Eval, RAG Eval, Test Plan, Test Cases, MLflow Lab.</p>
+      <figure class="shot">
+        <img src="img/qaagent-workspace.png" alt="Workspace: BrowserPanel bên trái, ChatPanel bên phải, sidebar điều hướng tool" loading="lazy">
+        <figcaption>Workspace — trạng thái chờ (chưa bấm Open Browser), thấy rõ sidebar điều hướng các tool.</figcaption>
+      </figure>
+
+      <h3>Các trang tool khác</h3>
+      <p>Sidebar còn dẫn tới <strong>Prompt Eval</strong> (so sánh prompt song song), <strong>RAGAS Eval</strong> + biến thể <strong>RAGAS Eval (browser-use)</strong> (chấm chatbot, hai cách lấy câu trả lời khác nhau), <strong>Test Plan / Test Cases</strong> (sinh test từ requirement), và tab <strong>Lab</strong> (MLflow — xem mục MLflow bên dưới). Mỗi trang tự scope dữ liệu theo Project đang chọn ở sidebar, nên đổi Project là đổi toàn bộ ngữ cảnh làm việc.</p>
+      <figure class="shot">
+        <img src="img/qaagent-ragaseval.png" alt="Trang RAGAS Eval (AB): so sánh 2 phương án chấm điểm chatbot" loading="lazy">
+        <figcaption>RAGAS Eval (AB) — chấm chatbot theo metric RAGAS.</figcaption>
+      </figure>
+    </section>
+
+    <section id="layout">
+      <p class="section-eyebrow">04 · Cấu trúc dự án</p>
+      <h2>Các thư mục chính</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Thư mục</th><th>Vai trò</th></tr>
+          <tr><td><code>src/qa_agent/agents/</code></td><td>Planner, Executor, Critic, Supervisor (multi-agent v2) + <code>framework/</code> (BaseAgent, MessageBus, ToolRegistry)</td></tr>
+          <tr><td><code>src/qa_agent/modules/ragas_eval/</code></td><td>Engine chấm RAGAS (web UI) — module lớn nhất; đang được nối vào MLflow</td></tr>
+          <tr><td><code>src/qa_agent/modules/testgen/</code></td><td>Requirement → test plan → test case (web UI)</td></tr>
+          <tr><td><code>src/qa_agent/observability/</code></td><td><strong>Mới:</strong> <code>mlflow_setup.py</code>, <code>prompt_registry.py</code> — lớp tracking/tracing</td></tr>
+          <tr><td><code>src/qa_agent/web/routes/</code></td><td>REST + WebSocket, gồm <code>mlflow_view.py</code> (mới) cho tab Lab</td></tr>
+          <tr><td><code>src/qa_agent/cli/commands/</code></td><td>Typer commands: <code>serve</code>, <code>ragas</code>, <code>run</code>, <code>config</code>, <code>report</code>, <code>mlflow</code> (mới)</td></tr>
+          <tr><td><code>web/src/pages/</code></td><td>Workspace, PromptEval, RagasEval(+AB), TestPlan, TestCases, <code>MLflowLabPage.tsx</code> (mới)</td></tr>
+          <tr><td><code>web/src/components/mlflow/</code></td><td><strong>Mới:</strong> trace-table, trace-tree, usage-overview, tool-calls, run-list</td></tr>
+          <tr><td><code>docs/decisions/</code></td><td>ADR — vì sao chọn kiến trúc này</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="mlflow">
+      <p class="section-eyebrow">05 · Trọng tâm hiện tại</p>
+      <h2>MLflow — thay thế dần cho RAGAS</h2>
+      <div class="callout">
+        <p class="callout-label">Đang triển khai · chưa lên main · chờ retest trước khi đưa lên sandbox</p>
+        <p>Toàn bộ lớp MLflow (tracking, autolog, tab Lab, CLI) đang nằm trên nhánh spike <code>feat/mlflow-spike-phase-00</code>, chưa merge. Một phần việc — scoping MLflow theo từng Project — hiện mới ở mức thiết kế (<code>plans/260928-0931-mlflow-per-project-scoping/plan.md</code>: "Design only — not yet implemented. Awaiting go-ahead").</p>
+      </div>
+      <p>Mục tiêu: dịch chuyển việc chấm điểm/quan sát chất lượng RAG chatbot từ pipeline RAGAS tự viết sang nền tảng tracing + judge của MLflow, để có trace chi tiết theo từng lời gọi LLM/tool thay vì chỉ một điểm số cuối cùng.</p>
+
+      <h3>Đã có sẵn trong code</h3>
+      <ul>
+        <li><strong>Tracking opt-in, không phá vỡ gì khi tắt</strong> — <code>observability/mlflow_setup.py</code>: chỉ bật khi có <code>MLFLOW_TRACKING_URI</code> trong env; mọi lỗi khởi tạo/ghi (log_param, log_metric, span…) đều degrade về no-op handle thay vì raise — nguyên tắc "tracing không được phép làm hỏng cái nó đang quan sát".</li>
+        <li><strong>Bedrock autolog</strong> — <code>mlflow.bedrock.autolog()</code> bật mặc định (<code>MLFLOW_AUTOLOG_BEDROCK=1</code>), tự sinh span cho mọi lệnh gọi Converse.</li>
+        <li><strong>Lưu trữ sqlite bền vững</strong> — mặc định <code>sqlite:///./qa-agent-data/mlflow.db</code>, sống qua restart.</li>
+        <li><strong>Tab "Lab" trong app</strong> — <code>web/routes/mlflow_view.py</code> là viewer read-only, không đụng tới cổng 5000 của MLflow server: liệt kê run/trace, dashboard usage (token, cost, latency p50/p90/p99, error rate theo ngày), rollup tool-call theo từng tool, xem chi tiết một trace theo span.</li>
+        <li><strong>CLI riêng</strong> — <code>qa-agent mlflow</code> serve MLflow UI đầy đủ trên store của project (mượn qua <code>uvx</code> nếu server đầy đủ chưa cài, vì app chỉ phụ thuộc <code>mlflow-skinny</code> — bản client, không kéo theo ~90 package của server).</li>
+        <li><strong>Vá lỗi judge của MLflow trên Bedrock</strong> — <code>ragas_eval/bedrock_judge_adapter.py</code>: adapter gốc của MLflow (<code>GatewayAdapter</code>) luôn gọi <code>get_endpoint_url("llm/v1/chat")</code>, mà provider Bedrock dùng boto3 nên không implement hàm đó → mọi judge <code>bedrock:/</code> trả về null. Patch route thẳng qua Bedrock Converse API mà agent đã dùng sẵn — đây chính là cơ chế để MLflow's native judges (thay cho scorer RAGAS tự viết) chạy được trên Bedrock.</li>
+      </ul>
+      <figure class="shot">
+        <img src="img/qaagent-mlflowlab.png" alt="Tab MLflow Lab (beta): usage dashboard, trace explorer" loading="lazy">
+        <figcaption>Tab MLflow Lab (beta) — chụp trực tiếp từ instance local, nhánh <code>feat/mlflow-spike-phase-00</code>.</figcaption>
+      </figure>
+
+      <h3>Đang làm tiếp</h3>
+      <p>Việc còn mở, theo <code>plans/260928-0931-mlflow-per-project-scoping/</code>: tab Lab hiện show lẫn lộn run/trace của mọi project vì 3 endpoint đọc (<code>/usage</code>, <code>/traces</code>, <code>/runs</code>) chưa lọc theo project. Hướng đã chốt — tái dùng tag có sẵn <code>qa_agent.project_id</code> (mỗi run khi ghi đã gắn tag này), thêm filter <code>project_id</code> optional vào 3 endpoint đọc, không tạo experiment mới hay migrate schema. Phương án "mỗi project một MLflow experiment riêng" đã bị loại vì phải resolve experiment theo từng request thay vì một lần lúc <code>init_mlflow()</code>, và phải migrate dữ liệu cũ — over-engineering so với nhu cầu thực tế.</p>
+    </section>
+
+    <section id="deploy">
+      <p class="section-eyebrow">06 · Deploy</p>
+      <h2>Sandbox</h2>
+      <p>Instance sandbox là một EC2 private (không public IP, chỉ vào qua SSM Session Manager), provision bằng Terraform trong repo <code>infra-sandbox</code> (<code>envs/dev/qa-agent</code>). Khi boot, instance tự clone repo này qua SSH (deploy key read-only) và chạy bằng Docker Compose: container <code>app</code> (FastAPI + React + Playwright headless) đứng sau reverse proxy <code>nginx</code> ở cổng 80, truy cập nội bộ tại <a href="https://qa-agent.techxcorp.com/" target="_blank" rel="noopener">qa-agent.techxcorp.com</a>.</p>
+      <p>Secrets: quyền truy cập repo qua GitHub deploy key read-only; <code>QA_AGENT_WS_TOKEN</code> do Terraform sinh. Cả hai được IAM role của instance kéo từ AWS Secrets Manager lúc boot — không có credential tĩnh nằm trên đĩa.</p>
+    </section>
+
+    <section id="cli">
+      <p class="section-eyebrow">07 · CLI</p>
+      <h2>Các lệnh chính</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Lệnh</th><th>Chức năng</th></tr>
+          <tr><td><code>qa-agent serve --web --web-dev</code></td><td>Chạy full stack: API + React hot-reload</td></tr>
+          <tr><td><code>qa-agent ragas eval --csv … --url … --kb …</code></td><td>Chấm chatbot theo metric RAGAS</td></tr>
+          <tr><td><code>qa-agent run --config config/rag-eval.yaml</code></td><td>Chạy một suite test theo config YAML</td></tr>
+          <tr><td><code>qa-agent config init / validate / show</code></td><td>Scaffold & kiểm tra config suite</td></tr>
+          <tr><td><code>qa-agent report list / show / export</code></td><td>Xem lại report của các run trước</td></tr>
+          <tr><td><code>qa-agent mlflow</code></td><td>Serve MLflow UI đầy đủ (cổng 5000 mặc định) trên store của project</td></tr>
+        </table>
+      </div>
+      <p>Module đã hoạt động: <code>rag_eval</code>, <code>chatbot_test</code>. Còn stub: <code>api_test</code>, <code>e2e_test</code>, <code>explore_test</code>, <code>perf_test</code>, <code>security_test</code>, <code>voicebot_test</code> (<code>qa-agent modules</code> liệt kê đầy đủ).</p>
+    </section>
+
+    <section id="learn-more">
+      <p class="section-eyebrow">08 · Trước khi đọc code</p>
+      <h2>Kiến thức nên tìm hiểu thêm</h2>
+      <p>Tài liệu này ưu tiên mô tả kiến trúc và trạng thái hiện tại; đây là những khái niệm nền nên nắm trước để đọc code nhanh hơn, không lặp lại nội dung đã có ở trên.</p>
+      <ul>
+        <li><strong>Metric RAGAS</strong> — Faithfulness, Answer Relevancy, Context Precision, Context Recall. Toàn bộ tab RAGAS Eval và phần lớn giá trị của MLflow judge xoay quanh 4 con số này — nên hiểu chúng đo cái gì trước khi đọc <code>ragas_eval/</code>.</li>
+        <li><strong>AWS Bedrock Converse API + Titan Embed v2</strong> — API gọi model thống nhất mà Planner/Executor/Critic và bước chấm faithfulness đều dùng.</li>
+        <li><strong>MLflow: experiment / run / trace / span</strong> — 4 khái niệm lồng nhau mà mọi thứ trong mục MLflow ở trên đều xoay quanh; hiểu trước sẽ đỡ nhầm giữa "run" (một lượt eval) và "trace" (một lệnh gọi LLM/tool cụ thể trong lượt đó).</li>
+      </ul>
+    </section>
+
+    <section id="refs">
+      <p class="section-eyebrow">09 · Tham khảo</p>
+      <h2>Liên hệ & tài liệu</h2>
+      <ul>
+        <li>Source: <a href="https://github.com/TechX-Corp/qa-agent" target="_blank" rel="noopener">github.com/TechX-Corp/qa-agent</a></li>
+        <li>Sandbox: <a href="https://qa-agent.techxcorp.com/" target="_blank" rel="noopener">qa-agent.techxcorp.com</a></li>
+        <li>Trong repo: <code>README.md</code>, <code>docs/deployment-sandbox.md</code>, <code>docs/cli-guide.md</code>, <code>docs/ragas-eval-guide.md</code>, <code>docs/decisions/</code> (ADR), <code>docs/iam/</code></li>
+        <li>Kế hoạch MLflow đang mở: <code>plans/260928-0931-mlflow-per-project-scoping/</code></li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span>Tài liệu tổng hợp onboarding · dựa trên README.md và mã nguồn nhánh <code>feat/mlflow-spike-phase-00</code></span>
+  <a href="index.html">← Về báo cáo tổng hợp</a>
+</footer>

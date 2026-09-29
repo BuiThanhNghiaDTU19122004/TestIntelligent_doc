@@ -1,0 +1,159 @@
+import os
+import re
+
+def generate_core_diagram():
+    xml = """<mxfile host="Electron" version="26.0.0">
+  <diagram id="core-arch" name="Core AWS Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="650" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="TECHX QA &amp; SECURITY PLATFORMS — CORE AWS ARCHITECTURE" style="text;html=1;fontSize=18;fontStyle=1;fontColor=#232F3E;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="25" width="650" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Minimal core components view across QA Cat and Pentest systems" style="text;html=1;fontSize=12;fontColor=#6E6A63;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="55" width="550" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- User / Client Box -->
+        <mxCell id="user_box" value="Clients" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_corporate_data_center;strokeColor=#5A6B7C;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#5A6B7C;fontStyle=1;fontSize=11;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="150" height="450" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user_qa" value="QA Web UI&#xa;(:5173)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4F2;strokeColor=#1F7A72;fontColor=#1F7A72;fontStyle=1;fontSize=12;align=center;" vertex="1" parent="user_box">
+          <mxGeometry x="15" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user_pt" value="Pentest Web UI&#xa;(:5175)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF0ED;strokeColor=#B3402A;fontColor=#B3402A;fontStyle=1;fontSize=12;align=center;" vertex="1" parent="user_box">
+          <mxGeometry x="15" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- AWS Cloud Boundary -->
+        <mxCell id="aws_cloud" value="AWS Cloud" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#232F3E;fontStyle=1;fontSize=13;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="95" width="930" height="450" as="geometry" />
+        </mxCell>
+
+        <!-- VPC Boundary (Compute) -->
+        <mxCell id="vpc" value="VPC (Compute)" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#8C4FFF;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#8C4FFF;fontStyle=1;fontSize=11;html=1;" vertex="1" parent="aws_cloud">
+          <mxGeometry x="30" y="45" width="250" height="375" as="geometry" />
+        </mxCell>
+
+        <mxCell id="qa_engine" value="QA Cat Engine&#xa;(FastAPI + Multi-Agent)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4F2;strokeColor=#1F7A72;fontColor=#1F7A72;fontStyle=1;fontSize=12;align=center;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="70" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="qa_ec2_icon" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="vpc">
+          <mxGeometry x="185" y="82" width="45" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pt_engine" value="Pentest Engine&#xa;(FastAPI + Orchestrator)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF0ED;strokeColor=#B3402A;fontColor=#B3402A;fontStyle=1;fontSize=12;align=center;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="250" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pt_ec2_icon" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;" vertex="1" parent="vpc">
+          <mxGeometry x="185" y="262" width="45" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Managed AI Services Group -->
+        <mxCell id="ai_group" value="AWS Bedrock (AI Platform)" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_identity_and_compliance;strokeColor=#01A88D;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#01A88D;fontStyle=1;fontSize=11;html=1;" vertex="1" parent="aws_cloud">
+          <mxGeometry x="320" y="45" width="270" height="375" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agentcore_browser" value="AgentCore Browser&#xa;(Remote DCV Cloud)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF7F5;strokeColor=#01A88D;fontColor=#01A88D;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="ai_group">
+          <mxGeometry x="20" y="70" width="155" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="agentcore_icon" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock_agentcore;" vertex="1" parent="ai_group">
+          <mxGeometry x="195" y="82" width="45" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bedrock_llm" value="Claude Opus / Sonnet&#xa;(Converse API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF7F5;strokeColor=#01A88D;fontColor=#01A88D;fontStyle=1;fontSize=12;align=center;" vertex="1" parent="ai_group">
+          <mxGeometry x="20" y="160" width="155" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bedrock_icon" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#01A88D;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.bedrock;" vertex="1" parent="ai_group">
+          <mxGeometry x="195" y="167" width="45" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bedrock_judge" value="LLM Judges &amp; Red-Team&#xa;(AgentScore / PyRIT)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF7F5;strokeColor=#01A88D;fontColor=#01A88D;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="ai_group">
+          <mxGeometry x="20" y="250" width="155" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Target Under Test Boundary -->
+        <mxCell id="target_group" value="Target Systems" style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_auto_scaling_group;strokeColor=#7AA116;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#7AA116;fontStyle=1;fontSize=11;html=1;" vertex="1" parent="aws_cloud">
+          <mxGeometry x="630" y="45" width="260" height="375" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tgt_web" value="Web &amp; Chatbot UI&#xa;(Frontend / DCV View)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F7E8;strokeColor=#7AA116;fontColor=#3E5C00;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="target_group">
+          <mxGeometry x="30" y="70" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tgt_api" value="REST APIs &amp; OpenAPI&#xa;(Backend Endpoints)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F7E8;strokeColor=#7AA116;fontColor=#3E5C00;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="target_group">
+          <mxGeometry x="30" y="160" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tgt_agent" value="AI Agent Targets&#xa;(HTTP / SSE Tool Calls)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F7E8;strokeColor=#7AA116;fontColor=#3E5C00;fontStyle=1;fontSize=11;align=center;" vertex="1" parent="target_group">
+          <mxGeometry x="30" y="250" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Clean Straight Horizontal Edges -->
+        <mxCell id="edge_user_qa" value="HTTP/WS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1F7A72;strokeWidth=2;fontColor=#1F7A72;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="user_qa" target="qa_engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_user_pt" value="HTTP/REST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#B3402A;strokeWidth=2;fontColor=#B3402A;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="user_pt" target="pt_engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_qa_browser" value="Drive Session" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1F7A72;strokeWidth=2;fontColor=#1F7A72;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="qa_engine" target="agentcore_browser">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_browser_target" value="Drive DOM" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#01A88D;strokeWidth=2;fontColor=#01A88D;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="agentcore_browser" target="tgt_web">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_pt_bedrock" value="Red-Team Loop" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#B3402A;strokeWidth=2;fontColor=#B3402A;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="pt_engine" target="bedrock_judge">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_judge_agent" value="Tool Attack" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#B3402A;strokeWidth=2;fontColor=#B3402A;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="bedrock_judge" target="tgt_agent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge_bedrock_api" value="Verify API" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#01A88D;strokeWidth=1.5;dashed=1;fontColor=#01A88D;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="bedrock_llm" target="tgt_api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>"""
+    with open(r"D:\Doc\diagram\TechX_AWS_Core_Architecture.drawio", "w", encoding="utf-8") as f:
+        f.write(xml)
+
+def generate_master_workbook():
+    with open(r"D:\Doc\diagram\TechX_AWS_Core_Architecture.drawio", "r", encoding="utf-8") as f:
+        core_content = f.read()
+    with open(r"D:\Doc\diagram\QA_Cat_AWS_Detail.drawio", "r", encoding="utf-8") as f:
+        qa_content = f.read()
+    with open(r"D:\Doc\diagram\Pentest_AWS_Detail.drawio", "r", encoding="utf-8") as f:
+        pt_content = f.read()
+
+    d_core = re.search(r'(<diagram .*?</diagram>)', core_content, re.DOTALL).group(1)
+    d_qa = re.search(r'(<diagram .*?</diagram>)', qa_content, re.DOTALL).group(1)
+    d_pt = re.search(r'(<diagram .*?</diagram>)', pt_content, re.DOTALL).group(1)
+
+    master_xml = f"""<mxfile host="Electron" version="26.0.0">
+  {d_core}
+  {d_qa}
+  {d_pt}
+</mxfile>"""
+    with open(r"D:\Doc\diagram\TechX_Master_Architecture.drawio", "w", encoding="utf-8") as f:
+        f.write(master_xml)
+
+generate_core_diagram()
+generate_master_workbook()
+print("Core diagram and master workbook regenerated.")
